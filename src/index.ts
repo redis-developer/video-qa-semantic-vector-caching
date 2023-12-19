@@ -1,5 +1,4 @@
 import config from './config.js';
-import { getCaptionData } from './captions.js';
 import * as openai from './openai/index.js';
 import * as hf from './hf/index.js';
 import { client } from './db.js';
