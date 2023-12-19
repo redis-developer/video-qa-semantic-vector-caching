@@ -8,11 +8,13 @@ try {
     const videos = await transcripts.load();
 
     if (config.use.OPENAI) {
-        const summaries = await openai.summarize.docs(videos);
-        await openai.store(summaries);
-        // const result = await openai.summarize.question('I am new to Redis, I understand a little bit about using Redis for caching. However, I would like to learn more about Redis Streams. Can you help me with that?');
+        // const summaries = await openai.summarize.docs(videos);
+        // await openai.store(summaries);
+        const result = await openai.search('I am new to Redis, I understand a little bit about using Redis for caching. However, I would like to learn more about Redis Streams. Can you help me with that?');
 
-        // console.log(result);
+
+
+        console.log(result.map((r) => r.metadata.link));
     } else if (config.use.HF) {
         //console.log(await getTranscripts());
         // await client.flushAll();

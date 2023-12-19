@@ -24,7 +24,8 @@ export default {
     openai: {
         API_KEY: process.env.OPENAI_API_KEY,
         ORGANIZATION: process.env.OPENAI_ORGANIZATION,
-        MODEL: process.env.OPENAI_MODEL ?? 'gpt-4',
+        EMBEDDING_MODEL: process.env.OPENAI_EMBEDDING_MODEL ?? 'gpt-4',
+        SUMMARY_MODEL: process.env.OPENAI_SUMMARY_MODEL ?? 'gpt-4',
     },
     use: {
         OPENAI: process.env.USE === 'OPENAI',
