@@ -8,3 +8,14 @@ export const client = redis.createClient({
 });
 
 await client.connect();
+
+export function cacheAside(prefix: string) {
+    return {
+        get: async (key: string) => {
+            return client.get(`${prefix}${key}`);
+        },
+        set: async (key: string, value: string) => {
+            return client.set(`${prefix}${key}`, value);
+        },
+    };
+}

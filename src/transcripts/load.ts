@@ -2,6 +2,7 @@ import { Document } from 'langchain/document';
 import { SearchApiLoader } from 'langchain/document_loaders/web/searchapi';
 import config from '../config.js';
 import { mapAsyncInOrder } from '../utils.js';
+import { cacheAside, client } from '../db.js';
 
 export type VideoDocument = Document<{
     id: string;
@@ -9,10 +10,28 @@ export type VideoDocument = Document<{
     link: string;
 }>;
 
+const cache = cacheAside('transcripts:');
+
 async function getTranscript(video: string) {
     console.log(
         `Getting transcript for https://www.youtube.com/watch?v=${video}`
     );
+
+    const existingTranscript = await cache.get(video);
+
+    if (existingTranscript) {
+        return [
+            new Document({
+                metadata: {
+                    id: video,
+                    fileName: video,
+                    link: `https://www.youtube.com/watch?v=${video}`,
+                },
+                pageContent: existingTranscript,
+            }),
+        ];
+    }
+
     const loader = new SearchApiLoader({
         engine: 'youtube_transcripts',
         video_id: video,
@@ -28,6 +47,8 @@ async function getTranscript(video: string) {
 
         return doc as VideoDocument;
     });
+
+    await cache.set(video, docs[0].pageContent);
 
     return docs;
 }

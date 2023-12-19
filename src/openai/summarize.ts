@@ -9,6 +9,8 @@ import {
 import { loadSummarizationChain, loadQARefineChain } from 'langchain/chains';
 import { llm } from './config.js';
 import { StringOutputParser } from 'langchain/schema/output_parser';
+import { wait } from '../utils.js';
+import { cacheAside } from '../db.js';
 
 const splitter = new TokenTextSplitter({
     chunkSize: 10000,
@@ -25,12 +27,30 @@ const questionSummarizeChain = QUESTION_PROMPT.pipe(llm).pipe(
     new StringOutputParser()
 );
 
+const cache = cacheAside('summaries:');
+
 export async function docs(allDocs: VideoDocument[][]) {
     const summarizedDocs: VideoDocument[] = [];
 
     for (const docs of allDocs) {
+        console.log(`Summarizing ${docs[0].metadata.link}`);
+        const existingSummary = await cache.get(docs[0].metadata.id);
+
+        if (existingSummary) {
+            summarizedDocs.push(
+                new Document({
+                    metadata: docs[0].metadata,
+                    pageContent: existingSummary,
+                })
+            );
+
+            continue;
+        }
+
         const docsSummary = await splitter.splitDocuments(docs);
         const summary = await videoSummarizeChain.run(docsSummary);
+
+        await cache.set(docs[0].metadata.id, summary);
 
         summarizedDocs.push(
             new Document({
