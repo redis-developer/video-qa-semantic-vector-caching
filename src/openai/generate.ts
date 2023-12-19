@@ -1,21 +1,10 @@
 import { Document } from 'langchain/document';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { RedisVectorStore } from 'langchain/vectorstores/redis';
 import { PromptTemplate } from 'langchain/prompts';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { StringOutputParser } from 'langchain/schema/output_parser';
 import { CaptionData } from '../captions.js';
-import config from '../config.js';
-import { client } from '../db.js';
-
-const llm = new ChatOpenAI({
-    openAIApiKey: config.OPENAI_API_KEY,
-    modelName: 'gpt-4',
-});
-
-async function wait(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { llm, vectorStore } from './config.js';
+import { wait } from '../utils.js';
 
 async function getCaptionSummary(caption: string) {
     const template = `Please provide a summary of the following caption in 3-4 sentences. Only include the semantic summary with keywords:
@@ -36,7 +25,7 @@ async function getCaptionSummary(caption: string) {
     return response;
 }
 
-async function generateTextEmbeddings(
+async function textEmbeddings(
     videos: CaptionData[]
 ): Promise<RedisVectorStore> {
     let documents: Document<{
@@ -59,16 +48,9 @@ async function generateTextEmbeddings(
         documents.push(doc);
     }
 
-    let embeddings = new OpenAIEmbeddings({
-        openAIApiKey: config.OPENAI_API_KEY,
-        modelName: 'gpt-4',
-    });
+    await vectorStore.addDocuments(documents);
 
-    return RedisVectorStore.fromDocuments(documents, embeddings, {
-        redisClient: client,
-        indexName: config.VIDEO_INDEX_NAME,
-        keyPrefix: config.VIDEO_PREFIX,
-    });
+    return vectorStore;
 }
 
-export { generateTextEmbeddings };
+export { textEmbeddings };
