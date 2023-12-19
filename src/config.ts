@@ -4,6 +4,7 @@ export default {
     redis: {
         VIDEO_INDEX_NAME: 'idx-videos',
         VIDEO_PREFIX: 'video:',
+        REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
     },
     hf: {
         MODEL: process.env.HF_MODEL ?? 'Xenova/all-MiniLM-L6-v2',
