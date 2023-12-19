@@ -1,7 +1,7 @@
 import { Document } from 'langchain/document';
 import { CaptionData } from '../captions.js';
 import * as config from './config.js';
-import { VectorDocument } from './store.js';
+import { VideoDocument } from 'src/transcripts/load.js';
 
 export async function queryEmbeddings(text: string): Promise<number[]> {
     return config.embeddings.embedQuery(text);
@@ -12,7 +12,7 @@ export function documentEmbeddings(videos: CaptionData[]): Document<{
     fileName: string;
     link: string;
 }>[] {
-    let documents: VectorDocument[] = [];
+    let documents: VideoDocument[] = [];
 
     for (let video of videos) {
         const doc = new Document({

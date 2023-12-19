@@ -1,0 +1,37 @@
+import { Document } from 'langchain/document';
+import { SearchApiLoader } from 'langchain/document_loaders/web/searchapi';
+import config from '../config.js';
+import { mapAsyncInOrder } from '../utils.js';
+
+export type VideoDocument = Document<{
+    id: string;
+    fileName: string;
+    link: string;
+}>;
+
+async function getTranscript(video: string) {
+    console.log(
+        `Getting transcript for https://www.youtube.com/watch?v=${video}`
+    );
+    const loader = new SearchApiLoader({
+        engine: 'youtube_transcripts',
+        video_id: video,
+        apiKey: config.search.API_KEY,
+    });
+
+    const docs: VideoDocument[] = (await loader.load()).map((doc) => {
+        doc.metadata = {
+            id: video,
+            fileName: video,
+            link: `https://www.youtube.com/watch?v=${video}`,
+        };
+
+        return doc as VideoDocument;
+    });
+
+    return docs;
+}
+
+export async function load() {
+    return mapAsyncInOrder(config.youtube.VIDEOS, getTranscript);
+}

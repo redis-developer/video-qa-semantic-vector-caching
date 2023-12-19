@@ -5,7 +5,7 @@ import { RedisVectorStore } from 'langchain/vectorstores/redis';
 
 export function getEmbeddings(modelName?: string) {
     return new HuggingFaceTransformersEmbeddings({
-        modelName: modelName ?? config.hf.MODEL,
+        modelName: modelName ?? config.hf.EMBEDDING_MODEL,
     });
 }
 

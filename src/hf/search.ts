@@ -1,7 +1,7 @@
+import { VideoDocument } from 'src/transcripts/load.js';
 import { vectorStore } from './config.js';
-import { VectorDocument } from './store.js';
 
-export async function search(search: string): Promise<VectorDocument[]> {
+export async function search(search: string): Promise<VideoDocument[]> {
     const KNN = 3;
-    return vectorStore.similaritySearch(search, KNN) as Promise<VectorDocument[]>;
+    return vectorStore.similaritySearch(search, KNN) as Promise<VideoDocument[]>;
 }
