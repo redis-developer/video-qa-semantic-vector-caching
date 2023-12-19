@@ -1,0 +1,643 @@
+0:00:00.400,0:00:05.440
+building a real-time application can be very 
+tricky and it often requires you to store data
+
+0:00:05.440,0:00:11.360
+in multiple different formats but did you know 
+redis stack makes redis a multi-model database
+
+0:00:11.360,0:00:15.680
+and supports many of the capabilities 
+you need all in a single database
+
+0:00:15.680,0:00:21.040
+thus saving you time and reducing complexity when 
+trying to use databases from several providers
+
+0:00:22.080,0:00:27.600
+i built a sample application here that is for 
+tracking a stock watch list under the hood it
+
+0:00:27.600,0:00:32.960
+stores data in several different ways using redis 
+stack as the primary database and message broker
+
+0:00:33.840,0:00:37.760
+not only am i using some basic data 
+types like sets and hashes but i'm
+
+0:00:37.760,0:00:42.640
+also storing json documents time series 
+data and even some probabilistic data
+
+0:00:43.680,0:00:48.960
+i'm also using pub sub to communicate information 
+between a few different micro services in real
+
+0:00:48.960,0:00:54.000
+time more on that later though for now let's dive 
+into what you're looking at the main focus of
+
+0:00:54.000,0:01:00.880
+this app is the watch list you can see here that 
+i'm watching a number of popular stock symbols
+
+0:01:00.880,0:01:08.880
+i can even search for more if i want to so i just 
+go in and i type in bac and you can see several
+
+0:01:08.880,0:01:15.440
+different stock tickers here and i can add those 
+to my watch list if i need to just by clicking on
+
+0:01:15.440,0:01:22.640
+them i can also remove them if i want to from 
+here and on the right hand side of this card
+
+0:01:22.640,0:01:27.600
+you can see the real-time trading information 
+so you'll see the latest trade from each stock
+
+0:01:27.600,0:01:32.720
+on the right hand side of the page you'll see 
+this card called trending stocks which displays a
+
+0:01:32.720,0:01:38.880
+list of most frequently traded stocks in my watch 
+list over the last minute every minute it resets
+
+0:01:38.880,0:01:43.600
+and keeps track of the number of trades that 
+happen within that minute the bottom of the
+
+0:01:43.600,0:01:49.760
+page shows information based on what stock you 
+select in your watch list so you can click on
+
+0:01:49.760,0:01:55.760
+different symbols in the watch list to change the 
+information that's displayed the chart is updated
+
+0:01:55.760,0:02:03.360
+in real time using the alpaca api the number in 
+the top left of the chart shows the latest trade
+
+0:02:03.360,0:02:08.960
+price as well as the delta between the latest 
+trade and the previous minute closing price
+
+0:02:09.680,0:02:13.920
+every minute i receive a new closing 
+price from alpaca and update this chart
+
+0:02:14.800,0:02:21.280
+on the right hand side you see recent news 
+this is news that's grabbed from the alpaca api
+
+0:02:21.280,0:02:26.400
+about the particular stock you're looking at now 
+let's break down how i'm storing retrieving and
+
+0:02:26.400,0:02:32.480
+managing the data used to populate this screen 
+the watch list is stored in redis as a set
+
+0:02:32.480,0:02:38.240
+a set makes the most sense for this case since 
+it automatically prevents any duplicate symbols
+
+0:02:38.240,0:02:45.120
+i'm also storing information about each stock 
+such as the name sector industry and a list of
+
+0:02:45.120,0:02:51.840
+news in a json document in redis stack the price 
+is stored in a time series using the time series
+
+0:02:51.840,0:02:57.840
+capabilities of redis stack this makes it easy to 
+get the latest price very quickly when the front
+
+0:02:57.840,0:03:03.280
+end requests the watch list i bring down some of 
+the information from the json document as well as
+
+0:03:03.280,0:03:10.240
+the latest trade for each symbol in the list then 
+i'm using a websocket to receive price updates
+
+0:03:10.240,0:03:16.800
+the trend list uses a top k filter which is a 
+feature built into redis stack that automatically
+
+0:03:16.800,0:03:22.800
+builds a leaderboard for you as trades come in 
+from the alpaca api i simply add them to the top
+
+0:03:22.800,0:03:28.320
+k filter and it lets me know if the leaderboard 
+has changed the chart uses time series data
+
+0:03:28.320,0:03:34.320
+retrieved in real time from the alpaca api 
+and stored in redis stack as a time series
+
+0:03:34.960,0:03:39.760
+when you store time series data in redis stack 
+it makes it very easy for you to query the data
+
+0:03:39.760,0:03:45.520
+over a date range as well as aggregate the data 
+it's perfect for storing data that you want to
+
+0:03:45.520,0:03:52.160
+visualize on a chart where time is on the x-axis 
+the news list is kept up to date using the alpaca
+
+0:03:52.160,0:03:58.800
+api and is stored in a json document in redis 
+stack along with other information about a stock
+
+0:03:58.800,0:04:04.320
+so you can see that while this app might look 
+simple on the front end behind the scenes there's
+
+0:04:04.320,0:04:09.440
+a lot going on and the entire thing is powered 
+by redis stack now let's look at an architecture
+
+0:04:09.440,0:04:15.040
+diagram for this application so you can get a 
+sense of how all the pieces fit together looking
+
+0:04:15.040,0:04:20.240
+at this architecture diagram we'll start over on 
+the left with the front end the front end which is
+
+0:04:20.240,0:04:25.760
+what we just looked at is responsible for getting 
+all the data needed to populate that dashboard
+
+0:04:25.760,0:04:31.920
+so that's the time series information to populate 
+the chart and the most up-to-date stock prices
+
+0:04:31.920,0:04:38.960
+it also populates the watch list it also gets 
+the trending stocks and it gets the news about
+
+0:04:38.960,0:04:44.720
+the stocks you're interested in what it also 
+does is it uses a websocket with the api service
+
+0:04:44.720,0:04:53.840
+to get real-time updates on stock prices news and 
+the trending stocks next we have the api service
+
+0:04:53.840,0:04:59.680
+so the api service is relatively simple it just 
+facilitates communication between the front end
+
+0:04:59.680,0:05:07.600
+and redis stack it updates the watch list when 
+you add or remove a stock from the watch list
+
+0:05:07.600,0:05:12.880
+on the front end and it queries for the data 
+needed to populate the front end so all that
+
+0:05:12.880,0:05:18.400
+data we just talked about the watch list the 
+leaderboard the time series data and the news
+
+0:05:19.680,0:05:26.240
+it also receives pub sub messages with 
+all the leaderboard updates new trades
+
+0:05:26.240,0:05:33.280
+and new bars which are the open and closed prices 
+for a stock it receives those directly from redis
+
+0:05:33.280,0:05:39.600
+and those are actually generated those messages 
+are generated by the streaming service so what
+
+0:05:39.600,0:05:46.240
+the streaming service does is it communicates 
+with the alpaca api to receive real-time news
+
+0:05:46.240,0:05:54.320
+trade information bars and quotes and when it 
+receives a new quote or a trade it will update the
+
+0:05:54.960,0:06:04.320
+leaderboard using redis bloom and the top k filter 
+then it publishes updates using pub sub with redis
+
+0:06:04.320,0:06:10.720
+for leaderboard changes or whenever there's a new 
+trade or a new bar available it also subscribes
+
+0:06:10.720,0:06:16.560
+to watch list updates so on the front end when you 
+add a stock to the watch list the api is going to
+
+0:06:16.560,0:06:22.960
+send a message to redis saying update the watch 
+list and the streaming service will receive that
+
+0:06:22.960,0:06:29.920
+message and automatically subscribe to updates 
+from the alpaca api for that particular stock
+
+0:06:29.920,0:06:36.160
+every time a new trade or bar or quote or news 
+comes into the streaming service from alpaca
+
+0:06:36.160,0:06:41.760
+it adds it to the time series for the stocks in 
+the watch list so what you can essentially see
+
+0:06:41.760,0:06:48.880
+here is that redis is handling a lot of what you 
+might otherwise use several other tools to do so
+
+0:06:48.880,0:06:56.800
+it not only does it let you store data in multiple 
+different formats but redistac also lets you use
+
+0:06:56.800,0:07:02.800
+pub sub to communicate between microservices i'm 
+sure by now you're itching to look at some code to
+
+0:07:02.800,0:07:08.000
+understand how the application is built instead 
+of showing you all the code which could take
+
+0:07:08.000,0:07:13.520
+several hours to go through in depth i'm going to 
+highlight some specific areas that are interesting
+
+0:07:13.520,0:07:18.720
+if you're interested in learning more you can find 
+the code in the description down below this video
+
+0:07:18.720,0:07:25.360
+looking at the code you can see i have an api 
+service a stream service and a ui service the
+
+0:07:25.360,0:07:30.960
+ui service is for the front end that we were just 
+looking at i'm not going to show you too much of
+
+0:07:30.960,0:07:37.280
+the front end code because it's fairly similar 
+to other applications you may have built but i
+
+0:07:37.280,0:07:47.120
+will mention that it's using tailwind css chart.js 
+and nexjs so it's a very typical front-end next.js
+
+0:07:47.760,0:07:54.080
+application that just calls an api to get all 
+the data but let's look at what the api looks
+
+0:07:54.080,0:08:01.600
+like i wrote the api using python and fast api as 
+well as redisome for communicating with redistac
+
+0:08:01.600,0:08:08.480
+so the first two routes here are for the watch 
+list it lets you watch and unwatch stocks
+
+0:08:08.480,0:08:15.600
+so add and remove stocks from your watch list i'm 
+using a redis set to keep track of your watch list
+
+0:08:15.600,0:08:20.640
+this makes it really easy because you can 
+automatically avoid duplicates the next route
+
+0:08:20.640,0:08:26.640
+is to just get the watch list what it does is 
+it grabs the set out of redis and then it uses
+
+0:08:26.640,0:08:34.400
+redis ohm to get all the json documents where the 
+symbol for the json document is in my watch list
+
+0:08:35.040,0:08:42.560
+this lets me bring more information forward such 
+as the news and some other information about the
+
+0:08:42.560,0:08:50.480
+stock another route is searching so this uses 
+redissearch to find stocks so when you're typing
+
+0:08:50.480,0:08:55.600
+in the form in your watch list on the front 
+end as soon as you get to a certain number
+
+0:08:55.600,0:09:02.560
+of characters i start searching for stock symbols 
+this uses redis search and redisown this route is
+
+0:09:02.560,0:09:10.400
+for getting all the bars over the last 30 minutes 
+so what i mean by bar is the alpaca api gives you
+
+0:09:10.400,0:09:18.000
+what's called bars that have a high price a low 
+price a volume an open price and a close price
+
+0:09:18.000,0:09:25.920
+within a certain time period so i'm looking at the 
+last 30 minutes of bars and this route just simply
+
+0:09:25.920,0:09:32.400
+you provide a stock symbol and it returns the bars 
+for you the next route gives you an individual
+
+0:09:32.400,0:09:37.920
+trade so it will give you the latest trade for 
+a particular symbol and the price of that trade
+
+0:09:38.480,0:09:45.680
+both of these routes are using redis time series 
+which is part of redis stack and it stores time
+
+0:09:45.680,0:09:51.520
+series data so that you can easily query it 
+over a range kind of like we're doing here
+
+0:09:51.520,0:09:56.960
+or get the latest value which is what we're doing 
+here this is the trending route so this will give
+
+0:09:56.960,0:10:02.560
+us the list of trending stocks remember those 
+stocks are trending based on the trading frequency
+
+0:10:02.560,0:10:08.880
+so all this does is looks at the top k filter 
+and asks it to give us the list this is using
+
+0:10:08.880,0:10:13.600
+redis bloom which is part of redis stack now 
+the next few things might look like routes but
+
+0:10:13.600,0:10:19.360
+they're actually web sockets so i have a trending 
+stock websocket here where the front end can say
+
+0:10:19.360,0:10:27.200
+hey give me all updates about trending stocks and 
+this will just listen to redis stack for messages
+
+0:10:27.200,0:10:32.960
+about the trending stocks and automatically 
+inform you that there's an updated trending list
+
+0:10:33.760,0:10:38.480
+this next one is similar but for trades so 
+it lets you know whenever there's a new trade
+
+0:10:39.440,0:10:43.760
+and then the last one is for bars so it 
+will let you know when there's new bars
+
+0:10:43.760,0:10:50.080
+on the front end this is how we update all of 
+the price information in the watch list and this
+
+0:10:50.080,0:10:57.280
+is how we update the graph that's about it for 
+the api let's look at the streaming service now
+
+0:10:58.080,0:11:01.760
+the first thing we want to look at for the 
+streaming service is the entry point which
+
+0:11:01.760,0:11:09.600
+is the main.pi so that like the api this is 
+written in python and it uses the alpaca sdk
+
+0:11:09.600,0:11:14.960
+as well as redis stack in the main loop all 
+that we're doing is connecting to alpaca
+
+0:11:15.520,0:11:20.720
+deleting the trending stocks so the training 
+stocks key is what we use to keep track of the
+
+0:11:21.760,0:11:29.200
+trending stocks using redis bloom and top k then 
+it reserves the training stocks again and syncs up
+
+0:11:29.200,0:11:35.840
+the watch list with whatever is in the set in 
+redis at that time what reserve top k does is
+
+0:11:36.880,0:11:45.520
+it just reserves this key to be used with the top 
+k filter and we're saying keep track of the 12
+
+0:11:45.520,0:11:52.320
+most frequently traded stocks and then we also 
+set an expiration of this key to 60 seconds
+
+0:11:53.040,0:11:59.680
+the reason for this is every 60 seconds we rebuild 
+the training stock list so on the front end
+
+0:12:00.400,0:12:07.440
+every 60 seconds you can see okay what stocks are 
+being actively traded so this is where we're using
+
+0:12:07.440,0:12:14.800
+pub sub to understand when the training stocks 
+key has expired and whenever it's expired we
+
+0:12:14.800,0:12:21.520
+re-reserve it and start rebuilding the list we're 
+also listening to the watch list so if you recall
+
+0:12:21.520,0:12:28.080
+in the api on the front end you can add something 
+to your watch list or remove it when you do that
+
+0:12:28.080,0:12:35.040
+the api simply updates the set within redis well 
+here we're going to be listening to that watchlist
+
+0:12:35.040,0:12:40.400
+key space and whenever it updates we will sync 
+it so let's dive into what that looks like here
+
+0:12:41.280,0:12:48.640
+when we sync the watch list we're basically 
+getting the watch list doing a set comparison and
+
+0:12:48.640,0:12:53.600
+unsubscribing from anything we need to unsubscribe 
+from and subscribing to whatever we need to
+
+0:12:53.600,0:13:00.320
+subscribe to the rest of this is all alpaca 
+related so we call subscribe trades these are
+
+0:13:00.320,0:13:08.000
+how we listen to the alpaca api in real time and 
+get trades as well as bars we can also initialize
+
+0:13:08.000,0:13:15.680
+a stock if we need to and what this will do is it 
+will give us historical trades and historical bars
+
+0:13:15.680,0:13:22.640
+about the stock and it'll also create the time 
+series keys that we need in redis stack so here
+
+0:13:22.640,0:13:29.840
+it's creating all the time series with all the 
+trades over the last whatever time period we
+
+0:13:29.840,0:13:35.280
+decided which i think i decided the time period 
+was going to be the last 30 minutes or something
+
+0:13:37.520,0:13:43.600
+and that's about it in here the next piece of 
+this is what happens as incoming trades and
+
+0:13:43.600,0:13:51.520
+incoming bars come in as incoming trades come 
+in we add the trade to our time series and then
+
+0:13:51.520,0:13:59.360
+we also add it to our top k and then we publish an 
+update saying okay the top we've updated the top k
+
+0:13:59.360,0:14:07.920
+so there are is a new trade in the top k that will 
+tell our api to update the top k list on the front
+
+0:14:07.920,0:14:13.120
+end and if you remember there's a websocket that 
+the front end can listen to to get updates to
+
+0:14:13.120,0:14:22.560
+those trending stocks so message flow here is an 
+incoming trade comes from alpaca then we publish
+
+0:14:23.120,0:14:31.520
+a message saying okay we've updated the trades 
+and updated the trending stocks list then the api
+
+0:14:31.520,0:14:38.080
+receives that message and it will notify the front 
+end if there are any changes needed and i've just
+
+0:14:38.080,0:14:44.880
+shown you just a little sneak peek of all the 
+code that is in here i wanted to show you some
+
+0:14:44.880,0:14:51.760
+specific things to have you get a sense of how all 
+of the pieces fit together within this application
+
+0:14:51.760,0:14:59.520
+but the next thing i want to show you is how this 
+looks in redis insight in redis insight you can
+
+0:14:59.520,0:15:06.080
+see how we have a bunch of json documents that 
+represent each stock so i pulled a bunch of data
+
+0:15:06.080,0:15:12.880
+from nasdaq directly to populate all this 
+information let's look at the watch list
+
+0:15:15.280,0:15:20.000
+so the watch list is a set and you can 
+see it has all the items that are on
+
+0:15:20.000,0:15:23.760
+that were represented on our 
+watch list on the front end
+
+0:15:23.760,0:15:29.040
+so this is how we're able to keep track of what 
+we're watching and add and remove things from
+
+0:15:29.040,0:15:34.480
+this set when we either don't want to watch them 
+anymore or with if we want to watch a new stock
+
+0:15:37.120,0:15:44.160
+now let's look at something on our watch 
+list so like apple so if i filter to apple
+
+0:15:44.160,0:15:50.560
+you'll see we have a bunch of different data 
+structures for apple itself the first one
+
+0:15:50.560,0:15:57.440
+is this json document so it stores information 
+such as the market cap the name apple common stock
+
+0:15:58.000,0:16:04.400
+the sector and the industry it also has an 
+embedded list of news articles so this is
+
+0:16:04.400,0:16:10.400
+where on the front end we're showing you all those 
+list of articles and then we let you click and go
+
+0:16:10.400,0:16:16.960
+to them this is what we're pulling from the alpaca 
+api so as new news articles come in we update this
+
+0:16:16.960,0:16:23.680
+json document with the article we're also storing 
+a bunch of different time series related to quotes
+
+0:16:23.680,0:16:32.240
+trades and bars you can't see the data in this 
+but let's look at what it looks like to get the
+
+0:16:32.240,0:16:40.480
+latest trade from apple so what we'll do is we'll 
+use the ts.get command to get the latest price of
+
+0:16:40.480,0:16:46.560
+the apple trade so the first value that's returned 
+is the timestamp and the second one is the price
+
+0:16:47.440,0:16:53.600
+and what we do is we query this over a range 
+in order to populate the chart on the front end
+
+0:16:54.560,0:17:02.240
+the command for that is ts.range and what i'll 
+do here is specify a from time stamp and a two
+
+0:17:02.240,0:17:10.560
+time stamp to get several different values so on 
+the front end we get a list of key value pairs
+
+0:17:10.560,0:17:17.280
+where the key is the timestamp and the value is 
+the stock price so hopefully by now you get a
+
+0:17:17.280,0:17:23.520
+sense of how powerful redis stack is and how it 
+turns redis into a multi-model database that you
+
+0:17:23.520,0:17:29.200
+can use to replace several technologies that you 
+would typically use in a real-time application
+
+0:17:29.840,0:17:39.760
+here our entire application from start 
+to finish is powered by redis stack

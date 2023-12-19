@@ -1,0 +1,2315 @@
+0:00:05.388,0:00:05.680
+[Music]
+
+0:00:05.680,0:00:09.680
+hello everyone my name is guy royce i'm 
+a developer advocate at redis and uh
+
+0:00:09.680,0:00:15.200
+welcome to my workshop this is the express and 
+redis workshop express and redisome express and
+
+0:00:15.200,0:00:18.400
+write a stack i don't know that i have a really 
+good title for it but we're going to call it a
+
+0:00:18.960,0:00:23.520
+using redis with express workshop thingy uh 
+and well today i'm going to show you how to
+
+0:00:23.520,0:00:30.640
+build a simple node.js api with express and redis 
+stack we're going to use redisome to do that uh
+
+0:00:30.640,0:00:35.360
+to interact with reta stack and uh i'm gonna do 
+this mostly with a bunch of code so uh expect a
+
+0:00:35.360,0:00:39.600
+lot of vs code action i don't really have any 
+pictures or anything other than well this one
+
+0:00:42.640,0:00:48.160
+i am going into this uh assuming that you know 
+a bit of express so uh although uh i'm not using
+
+0:00:48.160,0:00:54.400
+express in a particularly sophisticated way um 
+basic knowledge should serve you just fine and
+
+0:00:54.400,0:00:57.760
+to be honest if you don't haven't touched 
+express at all you don't know much about it
+
+0:00:57.760,0:01:01.360
+you don't know anything about it you're probably 
+going to be fine it's it's not anything it's i'm
+
+0:01:01.360,0:01:07.520
+not it's just rocket surgery so um i'm also 
+assuming that you've got redistac installed
+
+0:01:07.520,0:01:10.880
+i've watched an earlier video or read a 
+blog or something telling you how to do it
+
+0:01:11.440,0:01:15.360
+it's possible that content you've 
+consumed will even be created by future me
+
+0:01:15.360,0:01:20.240
+uh i guess i'll find out so i'm assuming you 
+got uh read us up and running with read a stack
+
+0:01:20.240,0:01:25.520
+and that you've got some basic express knowledge 
+not a lot and i'm assuming also that you don't
+
+0:01:25.520,0:01:30.480
+know a gosh darned thing about reticem and 
+well that's good because that's the point
+
+0:01:30.480,0:01:34.800
+of the workshop i'm going to show you how to 
+use express plus retisom to build a simple api
+
+0:01:37.200,0:01:40.720
+and that api is going to be a little person api 
+where we're going to do like you know hey go get
+
+0:01:40.720,0:01:45.200
+their name search for them by name and their age 
+and you know those sorts of things they may be
+
+0:01:45.200,0:01:51.920
+their location so um so we should start out with 
+some what the hecks are right so what the heck
+
+0:01:51.920,0:01:57.520
+is redisome uh you may not have heard of reticem 
+well retisom is a a library that uh well actually
+
+0:01:57.520,0:02:02.640
+was written by yours truly that provides uh 
+object mapping for redis which is to say it maps
+
+0:02:02.640,0:02:09.600
+redis data types specifically hashes or json 
+documents in this workshop we're going to use json
+
+0:02:09.600,0:02:15.920
+to javascript classes and objects uh and it allows 
+you to search over those hashes and json documents
+
+0:02:15.920,0:02:21.520
+um to do that it uses redis json and write a 
+search what are redis json what are the search
+
+0:02:21.520,0:02:27.440
+well for starters they're included in reda stack 
+but redis json and redis search are modules uh
+
+0:02:27.440,0:02:32.080
+modules are like plugins they extend the 
+capabilities of redis so if you've got a you
+
+0:02:32.080,0:02:40.160
+know a module like json it adds new data types uh 
+json documents and adds new commands uh commands
+
+0:02:40.160,0:02:45.040
+that manipulate json documents to redis and read a 
+search does the same thing but it adds commands to
+
+0:02:45.040,0:02:52.560
+create indexes or indices and to then do search so 
+that's redis home that's a little bit about what
+
+0:02:52.560,0:02:57.280
+redis json and reddit search are uh and 
+even what modules are uh we're gonna use
+
+0:02:57.280,0:03:03.360
+all these capabilities uh to build a relatively 
+restful uh person api relatively restful you know
+
+0:03:03.360,0:03:07.520
+it'll do all the crud operations and a little 
+bit a few other things they'll have basic data
+
+0:03:07.520,0:03:12.560
+like the age of that person their name uh and 
+we're gonna even throw in locations so we can
+
+0:03:12.560,0:03:16.640
+do like a simple location tracking app so maybe 
+you uh are using an app and it's like well this
+
+0:03:16.640,0:03:21.200
+person checked in at this restaurant and then 
+they checked in at this you know gas station
+
+0:03:21.200,0:03:25.360
+or whatever you can totally follow along with us 
+that's the intention of what we're building here
+
+0:03:25.360,0:03:29.200
+is that we're building something that that 
+we i i'm building this thing here for you
+
+0:03:29.200,0:03:33.760
+to follow along so the idea is you can watch 
+the code that i'm showing you pause the video
+
+0:03:34.880,0:03:41.280
+um type it in try it out see it work and then 
+resume the video and then do the next step um and
+
+0:03:41.280,0:03:46.000
+so there's a repo that you're going to use the 
+starter code to get this doing it's got a bare
+
+0:03:46.000,0:03:52.160
+bones express application with swagger 
+uh and it's got um three branches in it
+
+0:03:52.720,0:03:57.520
+uh one branch is the solution branch uh that's 
+the cheater code that's the code that you can
+
+0:03:57.520,0:04:00.560
+look at you say hey how does this thing work 
+you just go look at your solution branch
+
+0:04:01.200,0:04:05.680
+there are a steps branch which i'm 
+going to walk through all the steps
+
+0:04:05.680,0:04:10.240
+i'm not typing this whole time i'm going to use 
+a little tool to walk through my individual git
+
+0:04:10.240,0:04:15.040
+commits and you can go see the process that i 
+follow by following those steps too and there's
+
+0:04:15.040,0:04:19.520
+the main branch which is the one that you'll 
+clone that will actually just be your starter code
+
+0:04:19.520,0:04:23.920
+and uh the link to that github repo it'll be 
+in the description somewhere below hopefully or
+
+0:04:24.480,0:04:29.520
+wherever you found this video so that's what we're 
+building that's sort of the stuff you need to do
+
+0:04:29.520,0:04:35.360
+so go clone that repo and uh pause the video and 
+then come back and then i'll explain to you what
+
+0:04:35.360,0:04:42.320
+we're building in greater detail well welcome 
+back here on my screen we've got um persons
+
+0:04:42.320,0:04:48.240
+we want to store person data in uh redis using 
+redisone and i've got a small collection of json
+
+0:04:48.240,0:04:52.480
+files here in this person's folder and the repo 
+that uh you should have a clone of uh so i've got
+
+0:04:52.480,0:04:57.840
+like chris stapleton they're all musicians uh so 
+this is well that's chris stapleton joan jett uh
+
+0:04:58.800,0:05:05.760
+you could tell i'm a gen xer um and we got uh 
+carrie uh livgren who is the person from kansas
+
+0:05:05.760,0:05:10.960
+that did all we are as dust in the wind that was 
+his song so i've got uh various artists here so
+
+0:05:10.960,0:05:16.480
+let's look at uh let's look at chris staple now 
+let's look at jojet so uh the data we have that
+
+0:05:16.480,0:05:22.800
+we want to store is a basic json document 
+here this will be the request body when we
+
+0:05:22.800,0:05:29.440
+do the uh posts to create these so first name and 
+last name as strings we got an age uh joan jett is
+
+0:05:29.440,0:05:35.760
+shockingly 63 years old now um a verified flag the 
+idea here is are they verified on you know do they
+
+0:05:35.760,0:05:40.320
+have the little blue check mark next to them or 
+not uh their location you know this would be the
+
+0:05:40.320,0:05:44.720
+location tracking aspect are they you know what's 
+their longitude and latitude right this minute
+
+0:05:45.440,0:05:50.320
+and we have a little date here that represents 
+when that was last updated with a little iso
+
+0:05:50.320,0:05:55.760
+8609 date format we've got some skills that that 
+person has i picked some random ones that seem
+
+0:05:55.760,0:06:02.400
+appropriate for their uh their uh their aptitudes 
+and so joan has singing guitar because she plays
+
+0:06:02.400,0:06:07.120
+the guitar and uh she has black eyeliner because 
+she always used a lot of black eyeliner and her
+
+0:06:07.120,0:06:11.120
+personal statement is of course i love rock and 
+roll so put another dime in the jukebox baby
+
+0:06:11.840,0:06:16.960
+so this is the kind of data we're going to be 
+adding pretty pretty pretty straightforward right
+
+0:06:18.320,0:06:23.760
+so now that we know what we're building and what 
+the data looks like let's let's actually do all
+
+0:06:23.760,0:06:29.200
+the prereqs let's get everything set up so uh 
+the first thing that the first thing that we need
+
+0:06:29.200,0:06:32.240
+to make sure of is that you've got red of stack 
+up and running so you've got some redis version
+
+0:06:32.240,0:06:36.480
+running you you might be running that uh local 
+machine you might be running that in the cloud
+
+0:06:37.280,0:06:40.880
+you might have the password you might not 
+but let's make sure it's up and running
+
+0:06:40.880,0:06:45.200
+i've got redis up and running on my machine so 
+i'm gonna go to redis insight and confirm that
+
+0:06:45.200,0:06:50.560
+my redis instance is up and running so here we 
+are in redis insight here's a bunch of databases
+
+0:06:50.560,0:06:55.600
+i've got mine configured already if you want 
+to add one you just click add a redis database
+
+0:06:55.600,0:07:01.840
+uh i've got one called that local one which 
+is just localhost 6379 with uh no password
+
+0:07:02.720,0:07:07.440
+and uh this has two things here we've got a little 
+keys here i've got some old data from my previous
+
+0:07:07.440,0:07:13.600
+uh rehearsals of this talk uh and i'm going to uh 
+prove that redis is up and running uh i guess i
+
+0:07:13.600,0:07:19.280
+can just refresh it and yeah they're still working 
+uh by deleting everything so nukem from orbit
+
+0:07:19.280,0:07:24.080
+it's the only way to be sure so i'm gonna run the 
+flush all command this is a very dangerous command
+
+0:07:24.080,0:07:28.720
+it literally just deletes everything without 
+asking never ever ever ever run this casually
+
+0:07:28.720,0:07:35.200
+in production and but now it's all gone so if i go 
+back to my key list here and hit refresh it's all
+
+0:07:35.200,0:07:40.480
+gone you can see that stream's not there anymore 
+and so i have wiped the database and confirmed
+
+0:07:40.480,0:07:45.280
+that redis does indeed exist and is configured 
+and running and everything on my machine cool
+
+0:07:47.440,0:07:51.280
+the starter code that i've got here uh 
+this this library here there's not much
+
+0:07:51.280,0:07:56.080
+there there's a server.js and a little else 
+let me close some of these other windows here
+
+0:07:57.600,0:08:02.960
+but it needs some basic configuration uh if 
+you look here in the server.js i'm using uh
+
+0:08:02.960,0:08:10.080
+env and so what that does is it looks for a 
+file with the name of emv in your root and then
+
+0:08:10.080,0:08:16.560
+pulls environment variables out of it and so i've 
+got a sample.env in the repo that you can clone
+
+0:08:16.560,0:08:22.560
+that you just cloned and so you just need to copy 
+this file to env and the only configuration it
+
+0:08:22.560,0:08:28.320
+has it is the redis url and so here mine 
+is red is cool and slash localhost 6379
+
+0:08:28.320,0:08:33.120
+if you've got red a stack running locally this 
+is probably what yours is as well uh and all
+
+0:08:33.120,0:08:38.880
+i've done is i've copied that to env and deleted 
+some comments and so this is really the only part
+
+0:08:38.880,0:08:45.040
+that matters this is not a complicated file 
+so um set this to whatever your redis url is
+
+0:08:45.040,0:08:49.120
+it's probably what i have but it might not 
+be to be depending on how you've set redis up
+
+0:08:51.040,0:08:58.640
+so once you've got that established there's one 
+last thing that's kind of important and uh for
+
+0:08:58.640,0:09:04.240
+me it's already set up if you look here i got an 
+nvmrc i like to use node version manager and this
+
+0:09:04.240,0:09:09.760
+is the version of node i'm using so here we've got 
+16.3 which is the version i have you can use an
+
+0:09:09.760,0:09:16.160
+earlier one but there is a limit so um if i if you 
+do if i go no dash version you see i'm using node
+
+0:09:16.160,0:09:23.520
+16.3 but i'm in this example i'm using top level 
+awaits so used to be when you have an await in
+
+0:09:23.520,0:09:30.400
+your javascript code you'd have to wrap it in some 
+function that was async starting with node 14.6
+
+0:09:30.400,0:09:34.960
+you can do top level awaits so you can wait well 
+without having to be inside of the function at the
+
+0:09:34.960,0:09:40.960
+top level and so i'm using that in all my samples 
+so you need to make sure you're using node 14.8
+
+0:09:40.960,0:09:48.160
+or more recent or more recent version so i'm using 
+16.3 should work just fine with 14.8 or higher so
+
+0:09:48.160,0:09:55.360
+if you don't have that pause the video go get it 
+right now so that's the setup uh let's take a look
+
+0:09:55.360,0:10:00.480
+at uh what sort of skeleton code what's the 
+starter code look like and and what it looks like
+
+0:10:00.480,0:10:06.240
+is a well a bog standard express app so here we've 
+got uh you know i mentioned this earlier we're
+
+0:10:06.240,0:10:11.920
+importing that dot m for your uh configuration 
+with our redis url i'm bringing in express of
+
+0:10:11.920,0:10:16.720
+course because this is an express app i've got 
+swagger in here so we gotta you may have seen that
+
+0:10:16.720,0:10:21.120
+as i sliding back and forth here i've got swagger 
+so that you don't have to mess around with like
+
+0:10:21.120,0:10:26.240
+postman or doing curl or anything like that you 
+just get a nice little ui it defines the uh the
+
+0:10:26.240,0:10:31.680
+interface uh the api we're creating and lets you 
+test it as well so i'm using swagger ui to do that
+
+0:10:31.680,0:10:37.440
+and i'm using yaml js to convert my yaml files 
+to json so that swagger ui can deal with them
+
+0:10:39.120,0:10:44.400
+and then i create a brand new express app and 
+tell it to use json so hey if you get handed an
+
+0:10:44.400,0:10:50.320
+object as a result assume this json and convert 
+it to json and give it the right content type and
+
+0:10:50.320,0:10:56.320
+everything uh here's where i set up the swagger 
+in the root of this api so we've got comp swagger
+
+0:10:56.320,0:11:02.320
+document equals yaml.load this loads the yaml file 
+here which has the api specified in it so if we
+
+0:11:02.320,0:11:07.200
+look at this file we can see that hey look there's 
+yaml you're welcome to look at that on your own
+
+0:11:07.200,0:11:15.840
+time um so we load that yaml file in and then 
+this yaml js turns that into a javascript object
+
+0:11:15.840,0:11:22.400
+and then we uh call app.use and say on the 
+root use swagger ui and i mean honestly i
+
+0:11:22.400,0:11:25.760
+don't know exactly how this thing works i just 
+copied it from their documentation on github
+
+0:11:26.640,0:11:32.640
+so and i know that it does work so that's that's 
+the key thing here um so we're we're binding our
+
+0:11:32.640,0:11:39.600
+swagger ui to the root level and then we tell 
+our app to listen up for 8080. and that's it
+
+0:11:39.600,0:11:44.960
+now i should be able to just run this so let's go 
+ahead and clear this noise up and say npm start
+
+0:11:46.800,0:11:52.240
+and i'm using uh no daemon or nodemon 
+depending on how you want to say it and
+
+0:11:53.440,0:11:57.040
+so as i make changes it should just 
+restart automatically so let's uh
+
+0:11:58.720,0:12:02.000
+let's refresh this here just to 
+show that it's localhost 8080.
+
+0:12:03.040,0:12:09.920
+um command shift r and it reloads so uh this is 
+the swagger uri showing all the things that i
+
+0:12:09.920,0:12:15.120
+find in that api dot yaml we've got our person 
+put get post and delete these are our crud
+
+0:12:15.120,0:12:20.160
+operations for the user create read update delete 
+uh and we've got some search options and we have
+
+0:12:20.160,0:12:25.200
+a location updater thingy that we'll explain 
+later so we've got our server up and running
+
+0:12:26.560,0:12:33.600
+uh it's over here and we can we can invoke it like 
+if i hit execute here and we can see that we uh
+
+0:12:34.480,0:12:40.000
+get an uh get a html page back because this route 
+hasn't been implemented this is probably expressed
+
+0:12:40.000,0:12:46.600
+saying hey you can't do that route thing so 
+swagger is working yeah working [Laughter]
+
+0:12:47.760,0:12:53.840
+and that's pretty much the starter code so um 
+let's start making this more than starter code
+
+0:12:55.600,0:13:01.760
+so i am going to uh bring in the first few bits 
+here uh we need to create a client we need to
+
+0:13:01.760,0:13:09.120
+connect to redis and retisom does that using 
+a client and so let me bring that code up here
+
+0:13:11.760,0:13:17.680
+and so here we have a client.js file that i've 
+just created we import client from redis home
+
+0:13:19.040,0:13:24.640
+we get our url from the environment now this 
+is from that emv file uh that this ultimately
+
+0:13:24.640,0:13:31.360
+comes from and then all we do is we create a 
+new client with a new client and then we call
+
+0:13:31.360,0:13:36.720
+open on it immediately and open returns itself 
+it's a builder pattern and so then we can kind
+
+0:13:36.720,0:13:40.960
+of one line this and say wait new client open 
+and then the url and then we have a client and
+
+0:13:40.960,0:13:47.840
+then all we have to do is export that client easy 
+peasy we have connected to redis with retizone
+
+0:13:48.720,0:13:55.040
+i like to put my client in this file by itself 
+that way if i have multiple repositories which
+
+0:13:55.040,0:14:00.000
+we're going to get to in a minute we can sort of 
+guarantee that we have one and only one client
+
+0:14:00.560,0:14:04.080
+which works great with uh node 
+because node is single threaded
+
+0:14:04.080,0:14:08.400
+and redis is single threaded and so having a 
+single connection works out really well because
+
+0:14:08.400,0:14:14.640
+there's never going to be two processes using that 
+connection simultaneously so works out great so
+
+0:14:14.640,0:14:20.640
+let's uh continue on with this so now that we 
+have a client uh we need to create uh and we have
+
+0:14:20.640,0:14:26.560
+a client that redisohm can use to talk to redis 
+we need to create uh our entity and our schema
+
+0:14:26.560,0:14:31.280
+so redisome needs an entity which is uh the things 
+that we're reading and writing this is the person
+
+0:14:32.080,0:14:38.960
+and a schema schema is the thing that defines how 
+redis talks to uh how redis maps that entity to
+
+0:14:38.960,0:14:45.600
+json or hashes in our case json and what the 
+field names are and if they're they're aliased
+
+0:14:45.600,0:14:51.600
+and and all the types and those sorts of things so 
+it's it's that data about how to take the entity
+
+0:14:51.600,0:14:54.800
+and send it through us and how to take the 
+thing in redis and move it to the entity
+
+0:14:57.440,0:15:05.120
+to define an entity well that's it all right just 
+one line one line of code here and we define a
+
+0:15:05.120,0:15:11.440
+class within the entity name that we want so we 
+i've picked person because they're persons and
+
+0:15:11.440,0:15:16.720
+it needs to extend the entity class that we've 
+imported here and then it's just an empty class
+
+0:15:17.360,0:15:23.680
+when we define our schema redis ohm will add a 
+whole bunch of properties to the entity for you
+
+0:15:25.200,0:15:30.080
+and you can actually enter your own uh properties 
+in here as well so if you wanted to add say a
+
+0:15:30.080,0:15:34.320
+special property that like maybe reads a couple 
+of the other properties and computes some new
+
+0:15:34.320,0:15:39.280
+property you could do that we're not going to do 
+that for this example though once we've got that
+
+0:15:39.280,0:15:45.280
+person we need to say how do we map this entity 
+to uh redis and we do that by creating a schema so
+
+0:15:45.280,0:15:51.760
+here i've got a constant person schema i call new 
+schema and i pass in the class that i just defined
+
+0:15:52.720,0:15:58.800
+this very boring class up here and then we pass 
+in this big object down here and this is just a
+
+0:15:58.800,0:16:04.800
+javascript object that has uh keys and values for 
+all of uh it has all that metadata i was talking
+
+0:16:04.800,0:16:10.400
+about earlier so we have a field in uh redis and 
+that we're going to add to our entity called first
+
+0:16:10.400,0:16:17.680
+name it is a string so in redis home a string is 
+a whole string we're matching the entire string
+
+0:16:18.240,0:16:23.920
+or or not there's no partial string matching so 
+we'll say you know find all the the people with
+
+0:16:23.920,0:16:31.120
+the name chris or like uh chris stapleton or joan 
+for joan chat the last name is also a string same
+
+0:16:31.120,0:16:34.960
+idea hey you know so we got first name and last 
+name they're both strings so we can look for
+
+0:16:34.960,0:16:40.160
+all the people named stapleton with the last name 
+but we couldn't look for people whose name starts
+
+0:16:40.160,0:16:48.000
+with the staple it has to be the whole string we 
+get age that's a number so uh joan jets amazing
+
+0:16:48.000,0:16:54.400
+63 years uh we've got verified that's a boolean 
+and so these boolean fields and these uh number
+
+0:16:54.400,0:16:58.400
+fields and these string fields will be stored 
+as javascript strings and numbers and booleans
+
+0:16:58.400,0:17:04.720
+and in radis they will be stored under red and 
+redis json as a string in a json document and as a
+
+0:17:05.360,0:17:10.000
+number in a json document and as a boolean 
+in a json document so it's true to type
+
+0:17:11.440,0:17:17.520
+we've got a location here which is a point a 
+point is a point on the globe a geo location
+
+0:17:17.520,0:17:23.840
+so it's a latitude and longitude and so this is 
+stored as a latitude and longitude in redis redis
+
+0:17:23.840,0:17:29.360
+stores that internally as a string with 
+the longitude comma the latitude uh and
+
+0:17:29.360,0:17:34.080
+redisome maps that to a simple javascript object 
+that's got a longitudinal latitude property
+
+0:17:36.240,0:17:43.840
+location updated is a date this is a javascript 
+date write us turns treats that as a javascript
+
+0:17:43.840,0:17:49.360
+date that we know and love and hate uh in 
+redis it's stored as a unix epoch time in
+
+0:17:49.360,0:17:54.240
+the number of uh seconds since the beginning 
+of uh since the beginning of the unix epoch
+
+0:17:55.120,0:18:00.720
+uh we've got a stringer right here so the skills 
+is a string array this is skills that that person
+
+0:18:00.720,0:18:07.040
+might have and like in joan jett's case she had 
+a singing guitar and black eyeliner um that is
+
+0:18:07.040,0:18:15.520
+a string array and that is actually stored 
+in redis uh json as a an array um of strings
+
+0:18:16.320,0:18:21.200
+and and it's actually stored as an array in 
+javascript as well and uh they all have a personal
+
+0:18:21.200,0:18:26.960
+statement and that's a type text and so text is 
+kind of like string in the sense that if you let's
+
+0:18:26.960,0:18:30.400
+if you pull it back it's just stored 
+in a javascript into javascript string
+
+0:18:30.400,0:18:36.960
+but the the text statement or the text field type 
+is uh different when it comes to searching it
+
+0:18:36.960,0:18:41.040
+uh when we search for like the first name 
+or last name it's all or nothing match the
+
+0:18:41.040,0:18:47.200
+whole whole name or don't match it or match the 
+state or don't match it the personal statement is
+
+0:18:47.200,0:18:52.400
+full text search smart it knows how to search 
+text that's human readable so like paragraphs
+
+0:18:52.400,0:18:57.360
+and essays and statements so you know joan 
+jetts personal statements i love rock and roll
+
+0:18:58.640,0:19:06.720
+and the text search is smart um it can 
+match on uh grammatically equivalent things
+
+0:19:06.720,0:19:13.200
+so if you were searching for the word uh give 
+it might it would also match gives given giving
+
+0:19:14.000,0:19:18.240
+and gave because it knows that those are all 
+grammatically equivalent as far as search is
+
+0:19:18.240,0:19:24.240
+concerned it also ignores common words like a n or 
+the because they're not useful to search on and so
+
+0:19:24.800,0:19:30.800
+uh it's very powerful it's very useful but um 
+it doesn't it's not suitable for doing whole
+
+0:19:31.520,0:19:36.960
+searches and you can't say well give me like 
+these first 10 you know give me a string that
+
+0:19:36.960,0:19:42.320
+starts with like these 10 words exactly 
+with the stop words and everything that's
+
+0:19:42.320,0:19:47.040
+harder to do with read a search so you can 
+match on whole words with search up here
+
+0:19:47.040,0:19:52.240
+or you can match full text between the two of 
+those you can handle almost any search criteria
+
+0:19:52.240,0:19:56.480
+you'd want and then you add in the numbers and 
+the strings and the dates and it's it's fantastic
+
+0:19:57.360,0:20:01.120
+so that's what we got so far that was 
+a lot on a little bit of code wasn't it
+
+0:20:02.960,0:20:05.840
+um once you have a schema 
+that's defining this mapping
+
+0:20:06.480,0:20:12.560
+on all these field types then you can use the 
+client remember the client to fetch a repository
+
+0:20:12.560,0:20:17.440
+the repository is the thing that allows us to do 
+all the operations with the entities it creates
+
+0:20:17.440,0:20:21.760
+the entities it reads the entities it updates 
+the entities it deletes the entities it searches
+
+0:20:21.760,0:20:26.720
+for entities it does all the stuff that we want 
+to do with entities and so we say client.fetch
+
+0:20:26.720,0:20:33.840
+repository pass in that schema and we get a 
+repository which we're going to of course export
+
+0:20:36.960,0:20:43.120
+now we have everything we need to do to talk 
+to redis using reticent uh so let's go to the
+
+0:20:43.120,0:20:47.040
+other side of things let's go to the front 
+end let's go and define a router for express
+
+0:20:47.040,0:20:52.160
+that'll show us how to do that that'll let us 
+actually create read update and delete things so
+
+0:20:53.280,0:20:57.120
+i have created in here a router person router
+
+0:20:58.080,0:21:03.200
+and so i'm doing basic express stuff import 
+the router from express import the personal
+
+0:21:03.200,0:21:08.560
+repository that we just created from the 
+person.js and create a router that we export
+
+0:21:10.720,0:21:14.560
+and we're going to create some 
+stubbed out routes here we got the
+
+0:21:14.560,0:21:19.200
+the create the read the update and delete the put 
+to get the post and the delete put doesn't take
+
+0:21:19.200,0:21:24.640
+an id of course because we'll generate that 
+for you uh get post and delete do take ids
+
+0:21:25.840,0:21:32.880
+and then we need to bind this in our server.js so 
+if we go to server.js here we've got here we've
+
+0:21:32.880,0:21:39.040
+added a line app.use and we added the slash person 
+route is going to be handled by person router
+
+0:21:39.040,0:21:43.840
+so you go to slice person slash id and you 
+do a delete that will delete that person
+
+0:21:47.040,0:21:52.400
+there's our personal writer so 
+let's flush one of these out and
+
+0:21:53.920,0:21:58.880
+see what it looks like so i always like to start 
+with create because you have to have a create you
+
+0:21:58.880,0:22:03.520
+have to have a thing before you can read it update 
+it or delete it so gotta have a thing first so
+
+0:22:03.520,0:22:12.320
+i'm gonna do create here so we do a router.put 
+slash this would be slash person slash we have
+
+0:22:12.320,0:22:16.960
+a convenient little method on the repository 
+called create and save create and save takes a
+
+0:22:16.960,0:22:22.800
+simple javascript object containing all the person 
+data in the format that redis ohm is expecting it
+
+0:22:24.240,0:22:34.800
+through wonderful coincidence we happen to have 
+uh objects that are in exactly that format so um
+
+0:22:35.760,0:22:40.240
+so yeah so all we have to do is call create and 
+save and just pass in the body from our request
+
+0:22:42.000,0:22:45.760
+and then that will save it and return 
+a person with an id added to it
+
+0:22:45.760,0:22:49.280
+so this person will have all the things 
+it has and it will have an entity id on it
+
+0:22:49.840,0:22:55.920
+and then we just return that person on 
+the response so this should be working
+
+0:22:56.880,0:23:01.600
+let's try it who should we add let's add uh do 
+you want to add joan jett or chris stapleton
+
+0:23:01.600,0:23:08.000
+let's do chris stapleton so i'm going to select 
+all of chris stapleton and we're going to go over
+
+0:23:08.000,0:23:13.760
+here to our swagger interface we're not going to 
+do persons all we're going to do a create person
+
+0:23:16.080,0:23:20.800
+and create person uh takes a the body there 
+i have a sample body with rupert holmes
+
+0:23:20.800,0:23:25.120
+he's the guy who created the pina colada 
+song but we're gonna we're gonna add
+
+0:23:25.840,0:23:30.560
+fish stapleton and we can see here we've got all 
+those fields that we were talking about before
+
+0:23:31.440,0:23:38.640
+and let's go ahead and execute that and we get 
+a response back here here's our curl put our url
+
+0:23:38.640,0:23:44.560
+and then here's our data this url we used and 
+then here's the response we get back we get the
+
+0:23:44.560,0:23:53.360
+entity id this is the unique id representing that 
+record uh it's a eulid which is uh like a uuid
+
+0:23:53.360,0:24:00.400
+but um tidier that might be a good way to describe 
+it uh it's more compact uh and um so it's because
+
+0:24:00.400,0:24:06.240
+it's not using hexadecimal encoding it's using i 
+think it's called base 32 encoding uh where it has
+
+0:24:06.240,0:24:12.080
+fewer letters and it's very url friendly so we use 
+eulids and then all of the data that we just added
+
+0:24:13.760,0:24:19.600
+and so this should exist in redis now we did 
+you know we went through our code here if we
+
+0:24:19.600,0:24:24.880
+go back to our code the person router uh 
+called personal repository create and save
+
+0:24:24.880,0:24:27.520
+let's see if it actually created 
+it we'll go out into redis insight
+
+0:24:28.720,0:24:35.760
+we'll refresh our keys and we see oh look hey 
+there's a key it's a json document um it's got
+
+0:24:35.760,0:24:42.400
+the key name is person colon and a ulid this 
+is the ulid we just uh copied um this person
+
+0:24:42.400,0:24:48.160
+colon the person comes from the the entity name 
+so our class our entity class is called person
+
+0:24:48.160,0:24:55.600
+so we just interrogate that and that becomes the 
+key is the entity name plus the uh the uh the ulid
+
+0:24:55.600,0:25:00.720
+so if we click on this we can look and see that 
+there is chris stapleton he has 43 he's verified
+
+0:25:00.720,0:25:06.880
+this is his location which is lexington kentucky 
+the location updated there it is is the unix epoch
+
+0:25:06.880,0:25:11.200
+time uh we can expand his skills here and see 
+that he has singing football and coal mining
+
+0:25:12.160,0:25:15.760
+which i'm sure he learned from 
+his parents her father probably
+
+0:25:16.320,0:25:22.560
+um and it is uh his personal statement is 
+a line from that song sometimes i cry so um
+
+0:25:22.560,0:25:32.320
+i'm not going to read it because it's too sad um 
+so yeah it created it huzzah okay well let's uh
+
+0:25:33.600,0:25:38.240
+let's read it now we've created let's read so let 
+me go to the next little bit of code here let's
+
+0:25:38.240,0:25:44.400
+flush out our our read or our get and so this is 
+going to be slash person slash id where it's that
+
+0:25:44.400,0:25:50.880
+ulid and uh we have the id passed in so it's just 
+two lines of code we use that person repository
+
+0:25:50.880,0:25:57.680
+we call fetch and we pass in the id and that 
+returns a person and then we return the person
+
+0:25:59.440,0:26:03.520
+let's see if that works so we did a create up here
+
+0:26:04.640,0:26:13.520
+let's do a get we're going to try it out we'll 
+post in post and paste in that id call execute
+
+0:26:14.560,0:26:18.560
+and we can see that there indeed is chris 
+stapleton and all that data we had before
+
+0:26:18.560,0:26:27.200
+and it's converted that uh the the unix timestamp 
+to a nice iso 8601 date uh the location if we if
+
+0:26:27.200,0:26:32.000
+we go back here and look at the location you'll 
+see its uh longitude comma latitude as a string
+
+0:26:32.800,0:26:38.800
+and we've converted that into nice little objects 
+here in redison so reticom does all that for you
+
+0:26:41.760,0:26:43.360
+cool and we could probably
+
+0:26:45.200,0:26:53.520
+let's try this here we should be able to just go 
+ahead and get this url here so this is just a get
+
+0:26:53.520,0:26:58.160
+so uh we can easily we don't need to use swagger 
+to do the get so that gets us that data as well
+
+0:27:00.400,0:27:05.840
+okay so create read what's next update
+
+0:27:07.200,0:27:12.160
+so update's a little more verbose but it's not 
+particularly complicated this is an all or nothing
+
+0:27:12.160,0:27:20.320
+update so you're taking um the uh the entire 
+request body and you're replacing every field
+
+0:27:21.600,0:27:28.560
+we're not updating individual fields here so you 
+pass in an id you pass in that request body uh you
+
+0:27:28.560,0:27:36.240
+fetch based on the id and then you uh that person 
+that you fetch you you replace all the properties
+
+0:27:37.760,0:27:42.160
+with uh the first name the last name 
+the the age the verified the location
+
+0:27:42.160,0:27:46.960
+all the properties that are in that body and here 
+i'm doing a knowledge coalescing operator here
+
+0:27:46.960,0:27:52.880
+so if first name is undefined then it sets it to 
+null if last name is undefined it sets it to null
+
+0:27:53.680,0:27:59.200
+and once we've done that then we call save 
+passing in that person and then it'll update it
+
+0:28:00.320,0:28:04.880
+and then we send that person back so let's 
+uh let's update uh young master stapleton
+
+0:28:07.120,0:28:09.200
+let's copy his data here
+
+0:28:12.000,0:28:16.720
+and we'll collapse that and go to 
+post to update and we'll try it out
+
+0:28:19.440,0:28:23.680
+and that's uh his data and i know 
+the id is different i don't want to
+
+0:28:26.000,0:28:30.160
+get that id there too i don't i don't 
+want to create a new record by mistake so
+
+0:28:31.040,0:28:35.040
+so we're going to call person id that's the id 
+and we're going to update that and we're going to
+
+0:28:35.040,0:28:41.280
+make chris stapleton uh we're going to make him 
+18. he said he's young again he'll be so happy
+
+0:28:43.360,0:28:50.080
+and uh here we see chris stapleton age 18. and if 
+we go back to here and refresh we see that chris
+
+0:28:50.080,0:28:56.320
+stapleton is age 18. so we've done an update we've 
+done a create we've done an update we've done a
+
+0:28:56.320,0:29:03.680
+delete we're going to create a read and update now 
+we're going to do a delete so delete is also very
+
+0:29:03.680,0:29:09.680
+short you simply call remove and pass in the 
+id and then here i'm returning the id back so
+
+0:29:10.960,0:29:16.000
+let's go ahead and delete this wonderful 
+chris stapleton who is now 18 years old
+
+0:29:18.800,0:29:23.360
+and execute it okay so it 
+issues a delete against that url
+
+0:29:23.360,0:29:28.560
+if we go back to here and refresh 
+error key with this name does not exist
+
+0:29:28.560,0:29:33.440
+that's correct it does not we refresh this 
+we'll see that uh chris stapleton is now gone
+
+0:29:35.680,0:29:42.480
+so create read update and delete using redisome 
+and express pretty cool but wait there's more
+
+0:29:43.760,0:29:46.560
+i wouldn't i wouldn't leave you with just 
+that uh because there's more that we can
+
+0:29:46.560,0:29:50.720
+do there's more neat stuff so let's we 
+got a whole bunch of searching to do so
+
+0:29:51.680,0:29:58.960
+we want to not just have to find these musicians 
+by their these persons by their id we would want
+
+0:29:58.960,0:30:02.640
+to look for persons that match certain criteria 
+we might have a lot more than you know we might
+
+0:30:02.640,0:30:08.800
+have a lot of persons in there and maybe you want 
+to find people that are of a certain age or with a
+
+0:30:08.800,0:30:14.560
+particular last name or they have particular words 
+in their personal statement or or are verified um
+
+0:30:15.920,0:30:20.320
+you can totally do that with retisome 
+that's what the redis search part of it is
+
+0:30:20.320,0:30:24.880
+so uh the first thing you have to do in 
+order to use search is you have to create
+
+0:30:24.880,0:30:30.800
+an index so here in the person repository in the 
+person.js i've added this line of code right here
+
+0:30:32.800,0:30:39.040
+uh grade index what this will do is it will create 
+an index and store it in redis and that index will
+
+0:30:39.040,0:30:48.720
+then allow us to use search commands and if i go 
+out and refresh it actually creates an index and
+
+0:30:48.720,0:30:51.120
+it creates a hash of that index out there 
+so we've got a little string it's got a
+
+0:30:51.120,0:30:54.800
+hash in there there's a little signature that 
+represents that index if you change your schema
+
+0:30:55.440,0:31:00.560
+it will compare these and this is all it's just 
+plumbing for redis i read a zone but it'll compare
+
+0:31:00.560,0:31:07.120
+these and if they're different it will rebuild 
+it'll delete and rebuild the index so you can just
+
+0:31:07.120,0:31:13.440
+call create index and not worry about it uh but uh 
+behind the scenes if you say well let's make age
+
+0:31:13.440,0:31:18.080
+you know another type or you know change your 
+data in some way uh it will uh rebuild that
+
+0:31:18.080,0:31:23.520
+index accordingly so we we got our uh we call call 
+create index that's the first thing you have to
+
+0:31:23.520,0:31:27.600
+do this is a really easy thing to miss and forget 
+when you're doing this you're like i got my schema
+
+0:31:27.600,0:31:31.120
+and everything and you forget to call create index 
+and then you're like why aren't all my searches
+
+0:31:31.120,0:31:35.920
+working it's because you didn't call create index 
+i've done it myself and i wrote the library so
+
+0:31:37.520,0:31:42.000
+i'm going to create another router for all of 
+the searching we want to do and so this is just
+
+0:31:42.000,0:31:48.160
+sort of bog standard router templating stuff so 
+let's see what's next i'm going to add the easiest
+
+0:31:48.160,0:31:53.920
+of all searches which is give me everything 
+star so here's the stubbed out route for that
+
+0:31:55.680,0:32:00.560
+if you go to slash persons slash routes or 
+persons slash person slash all this will code
+
+0:32:00.560,0:32:04.080
+will get implemented the implementation 
+for this is actually pretty simple
+
+0:32:05.440,0:32:11.920
+we use the personal repository where before we 
+call create or save or remove or fetch here we
+
+0:32:11.920,0:32:19.040
+call search and then search returns an object of 
+its own which you can call return on and all which
+
+0:32:19.040,0:32:24.560
+will return all of them there's other options you 
+can return like paginations you can just get the
+
+0:32:24.560,0:32:28.000
+count if you want there's a lot of options here 
+we're just going to call return all for now and
+
+0:32:28.000,0:32:31.600
+you can explore the other ways of returning 
+data and the other other ways of doing this
+
+0:32:32.160,0:32:38.000
+later in your in your when we're done but so 
+this is just going to search and return all
+
+0:32:38.000,0:32:42.720
+this is just searching on star and then it's 
+going to get an array of persons back and then
+
+0:32:42.720,0:32:47.360
+it's just going to send that back and it'll turn 
+into a json object and we got one last little bit
+
+0:32:47.360,0:32:52.560
+here we need to do because i haven't bound this 
+route this all route to anything in server.js
+
+0:32:52.560,0:32:58.880
+so in here i'm going to bind slash persons to 
+the search router so and with that we should
+
+0:32:58.880,0:33:07.040
+be able to uh search all so let's go and get 
+all the persons execute and well it worked
+
+0:33:09.120,0:33:13.680
+it's not very exciting but it worked uh we 
+don't have any data so there's nothing to
+
+0:33:13.680,0:33:20.640
+return so let's get some data in there i have 
+in my repository here a a little shell script
+
+0:33:20.640,0:33:26.960
+called low data load data.sh all it does is go 
+through this directory and take all the json files
+
+0:33:27.520,0:33:34.000
+and load them up and that's that that's all 
+it does so um let's run that really quick
+
+0:33:35.200,0:33:41.680
+uh i'll go ahead and stop the server change your 
+persons dot slash load and if you're using windows
+
+0:33:41.680,0:33:46.960
+um sorry but uh you should be able to create 
+a batch file that does something similar so
+
+0:33:48.560,0:33:55.520
+oh i [Laughter] see this happens to the best 
+of us right i actually need the server running
+
+0:33:55.520,0:33:59.760
+in order to connect to it so 
+let's let's create a new tab
+
+0:34:01.840,0:34:08.160
+and then uh go back here and then npm 
+starts get our server running and then
+
+0:34:08.160,0:34:14.000
+in this new tab we'll do we'll do the 
+uh the um while we're in it already
+
+0:34:14.000,0:34:20.880
+it will run the script okay so now it's created 
+a bunch of musicians to populate our data here
+
+0:34:24.320,0:34:30.880
+and if we go out to redis here we can see that 
+we've got the whole mess of persons there's joan
+
+0:34:30.880,0:34:41.920
+jett there's justin timberlake uh this is the guy 
+who wrote the toto's africa song i got eminem all
+
+0:34:41.920,0:34:48.560
+kinds of all kinds of folks and uh just for fun 
+let's go ahead and find chris stapleton in here
+
+0:34:50.800,0:34:53.760
+always the last place you look 
+right let's make chris stapleton 18.
+
+0:34:55.600,0:34:58.080
+because you know i like chris 
+stapleton he deserves it
+
+0:35:00.160,0:35:04.160
+okay and i actually did that for a reason 
+you'll find you'll find out soon enough
+
+0:35:04.880,0:35:11.920
+so now if i do a person's all search hit execute i 
+get all the person so there's joan jett and carrie
+
+0:35:11.920,0:35:18.160
+and rupert and david justin and 
+ivan and marshall and chris cool
+
+0:35:19.360,0:35:23.680
+so uh returning everything is all fine and 
+dandy but uh obviously we want to do things
+
+0:35:23.680,0:35:28.000
+that are a little more sophisticated than that 
+so uh let's go ahead and search by last name
+
+0:35:28.000,0:35:34.400
+so i've added another route here uh router.get by 
+last name and then you just specify the last name
+
+0:35:35.520,0:35:40.560
+uh this is um not terribly complicated 
+uh we we go ahead and pull that last
+
+0:35:40.560,0:35:43.840
+name out and assign it to a variable just 
+to make our code a little bit tidy here
+
+0:35:44.560,0:35:50.400
+and then instead of calling search return 
+all we say search and then we say where
+
+0:35:52.480,0:35:58.400
+and then where takes a string and that string 
+is the field name that we defined in our schema
+
+0:35:58.400,0:36:03.120
+so way back here in person.js we've got 
+a first name and a last name and an age
+
+0:36:03.120,0:36:05.280
+we're using last name so we want 
+to use this value right here
+
+0:36:07.600,0:36:12.240
+so that's what gets passed in here and then 
+we're saying equals and then we provide whatever
+
+0:36:12.240,0:36:17.280
+string we want to provide in there here we're 
+passing in last name and then call return all
+
+0:36:17.280,0:36:21.440
+and this will create a search that finds all 
+of the users that have a particular last name
+
+0:36:23.040,0:36:27.840
+this equals here is semantic sugar 
+you can say is equal is equal to
+
+0:36:30.160,0:36:34.240
+right um you know there's there's lots of
+
+0:36:34.960,0:36:39.840
+variations on this we're just 
+going to go with uh equals
+
+0:36:41.120,0:36:45.680
+uh but you can say is equal to or is 
+equals or does not does equal or you've
+
+0:36:45.680,0:36:53.840
+got lots of options there's lots of you 
+see does equal it all does the same thing
+
+0:36:55.360,0:36:58.720
+and when you go you go to retisom's 
+documentation there's examples of
+
+0:36:58.720,0:37:04.080
+all these there for you to play with so 
+we've got this little bit of code here
+
+0:37:04.080,0:37:08.400
+we can search by last name let's go ahead 
+and search by last name so let's look for
+
+0:37:11.200,0:37:14.400
+uh we'll look for holmes we'll look 
+over rupert holmes the pina colada song
+
+0:37:15.120,0:37:18.880
+person because i like pina 
+coladas and walks in the rain
+
+0:37:19.840,0:37:24.640
+so here we've searched by last name of holmes you 
+can see our url is uh persons by last name holmes
+
+0:37:27.200,0:37:32.720
+and here is the rupert's data so there's 
+his entity id and he's 75 years old
+
+0:37:34.400,0:37:39.760
+as of the time i created this data verified on 
+uh whatever this app is that we're building uh
+
+0:37:39.760,0:37:46.160
+this is his location which i think is somewhere in 
+the uk and um yeah all the data and he likes pina
+
+0:37:46.160,0:37:52.480
+coladas and taking blocks in the right so we were 
+able to search by last name we could search by uh
+
+0:37:52.480,0:37:59.840
+stapleton instead and then we get chris stapleton 
+there we go chris stapleton who is not 18.
+
+0:38:03.440,0:38:09.920
+cool uh in addition searching by strings we can 
+search by numbers so i've added a line here that
+
+0:38:09.920,0:38:17.680
+finds everyone that's 21 or older aka old enough 
+to drink in america so if you go to person slash
+
+0:38:17.680,0:38:22.400
+old enough to drink in america it will return 
+everyone except for chris stapleton so let's
+
+0:38:22.400,0:38:29.040
+let's try that one out um this one doesn't have 
+any arguments you just run it hit execute and
+
+0:38:29.040,0:38:37.360
+we'll see that there's joan jett and carrie and 
+rupert and david and justin timberlake and ivan
+
+0:38:37.360,0:38:41.840
+and eminem but no chris stapleton because 
+he is not old enough to drink in america
+
+0:38:45.040,0:38:53.600
+cool we can also do booleans and again if we 
+look at these queries here this is gte for
+
+0:38:53.600,0:38:59.680
+greater than or equal to we it also you can also 
+type in greater than or equal to or is greater
+
+0:38:59.680,0:39:04.720
+than or equal to there's a bunch of semantic 
+sugar uh to let you do this however you want
+
+0:39:05.760,0:39:13.360
+um for booleans very similar situation uh we want 
+to do a git for non-verified users not verified
+
+0:39:13.360,0:39:19.680
+and not unverified but non-verified so where 
+verified is not true and so here we're saying
+
+0:39:19.680,0:39:24.720
+where verified that's that field name is 
+is just a little binder word it doesn't do
+
+0:39:24.720,0:39:31.360
+anything it just makes it read like a sentence not 
+inverts the query and true says is equal to true
+
+0:39:31.360,0:39:35.280
+so where verified is not true now you might 
+be wondering why would we want to search for
+
+0:39:35.280,0:39:40.480
+a not true why don't we just search for 
+false well if the true field was missing
+
+0:39:40.480,0:39:46.720
+or the verified field was missing then it would 
+be null which would be neither true nor false
+
+0:39:46.720,0:39:52.480
+but we want things that are not true so not true 
+would return false or null so this catches both
+
+0:39:52.480,0:39:57.440
+of those uh so but we're saying we're verified we 
+could actually say verified not true and return
+
+0:39:57.440,0:40:02.880
+all and this will give us all the non-verified 
+users and we can go out and test that very quickly
+
+0:40:05.600,0:40:09.840
+and see that we do indeed get 
+false false false and false
+
+0:40:14.160,0:40:20.000
+and of course you can use all of these together uh 
+you you are restricted to searching by one field
+
+0:40:20.000,0:40:24.640
+so here i've got verified drinkers with last name 
+last name so these are people who are over the
+
+0:40:24.640,0:40:32.240
+age of 21 that are verified and have a last name 
+that equals the last name that you passed in so
+
+0:40:34.320,0:40:41.680
+all we're doing is saying search where verified 
+is true and ages 21 and last name and this could
+
+0:40:41.680,0:40:48.880
+be and there's also or so you can do or as well if 
+you like um and you can create more complex ones
+
+0:40:48.880,0:40:52.640
+those are documented on the website for 
+redisome there'll be links to that later
+
+0:40:52.640,0:40:57.680
+so go check those out too um but yeah that will 
+do a verified drinkers with last name so let's
+
+0:40:58.240,0:41:02.800
+hit that url really quick just to show that 
+that works verified drinkers with last name
+
+0:41:03.440,0:41:07.680
+i'm going to try it out we're going to find uh 
+verified drinkers with the last name of timberlake
+
+0:41:11.120,0:41:16.240
+and so that finds justin timberlake who 
+is verified is over 21 and does have the
+
+0:41:16.240,0:41:24.000
+last name of timberlake so that works as well uh 
+next we're going to show off um full text search
+
+0:41:24.640,0:41:29.120
+so that's this little bit here we're going to 
+do a full text search against their statements
+
+0:41:29.760,0:41:37.200
+so here we have with statement containing and then 
+text and so here we can pass in word or words uh
+
+0:41:37.200,0:41:42.560
+that we want to search for in a full text way um 
+this means the ways i described earlier when i
+
+0:41:42.560,0:41:47.520
+was describing the text field uh the uh you know 
+it understands the grammar it understands common
+
+0:41:47.520,0:41:54.480
+words that aren't useful in a search and makes 
+appropriate checks and so if we search for like
+
+0:41:54.480,0:42:00.480
+the word walk it will match walks if we search 
+for the word uh give it'll match uh given and gave
+
+0:42:01.360,0:42:08.000
+um and it ignores words like a n and the 
+so um to do that we just uh use the matches
+
+0:42:08.880,0:42:12.480
+verb here so we say where personal statement 
+matches and then we give it some text to match
+
+0:42:13.440,0:42:18.880
+don't you cannot use equals on these that won't 
+work you can't check a text field for equality
+
+0:42:18.880,0:42:23.440
+you can only search for words within that text 
+field if you want to do quality use a string
+
+0:42:25.040,0:42:28.800
+so here we're saying where the the personal 
+statement matches text that we pass in and then
+
+0:42:28.800,0:42:33.120
+we return all of those and this is actually kind 
+of neat the way it works so i'm going to look for
+
+0:42:34.800,0:42:41.680
+walk walk is a good example because i'm going 
+to search for walk and then our result finds
+
+0:42:42.880,0:42:48.800
+rupert holmes and chris stapleton uh so rupert 
+holmes says i like pina coladas and taking walks
+
+0:42:48.800,0:42:53.040
+plural even though we searched for 
+walk so it matched it anyhow right
+
+0:42:53.840,0:43:02.480
+and um here uh chris stapleton used the word walk 
+in his personal statement if i add rain do it
+
+0:43:04.720,0:43:07.680
+now we're just going to get 
+rupert because he has walk
+
+0:43:08.640,0:43:11.840
+and rain act let's do a take 
+as well that should work
+
+0:43:14.400,0:43:18.880
+yeah so taking got map to take so you can see 
+that stemming happening there where it understands
+
+0:43:18.880,0:43:26.240
+the grammar of english and it does support other 
+languages um and the other thing is is it ignores
+
+0:43:26.240,0:43:30.080
+common words like it's got the rain and so if 
+you start with that it'll match but it doesn't
+
+0:43:30.080,0:43:37.600
+have the word a in it or an so let's search 
+for let's add an and a and run it you can see
+
+0:43:37.600,0:43:42.800
+it still matches even though those words aren't 
+found in the personal statement so it's it knows
+
+0:43:42.800,0:43:46.960
+that a and and uh and things like that are common 
+words that aren't really useful for search because
+
+0:43:47.600,0:43:52.400
+it just matches everything and so it pulls 
+those out and so this is the full text search of
+
+0:43:52.400,0:44:01.440
+redis search being being utilized here very easily 
+from uh some redisome code so that's pretty neat
+
+0:44:02.880,0:44:09.440
+let's uh let's look at the next search one and 
+this is kind of my favorite uh just because
+
+0:44:09.440,0:44:13.680
+geo searching is kind of cool so we can do geo 
+fields we can look at points on the globe and
+
+0:44:13.680,0:44:20.160
+then say search for things within a radius of that 
+point so uh our route here is to get persons near
+
+0:44:21.040,0:44:29.520
+a point on the globe and a radius of that from 
+that point in miles i i chose to use miles because
+
+0:44:30.240,0:44:36.560
+uh i like freedom units because i use miles 
+because i'm an american sorry sorry not sorry
+
+0:44:38.960,0:44:42.240
+uh and so uh we're just going to pull out 
+the longitude the latitude and the radius
+
+0:44:42.240,0:44:47.200
+from our url here right and we're going to 
+convert those to numbers obviously this will
+
+0:44:47.200,0:44:51.280
+this could fail if you passed in invalid data 
+here i'm you know this you can make express
+
+0:44:51.280,0:44:57.840
+better this is just kind of show you how these 
+things fit together um and then when we do a
+
+0:44:57.840,0:45:03.840
+person's repository.search like we've done for all 
+of these we can say where location that'd be that
+
+0:45:03.840,0:45:08.720
+latitude and longitude that longitude and latitude 
+so we say in radius here we give it a circle
+
+0:45:09.840,0:45:13.520
+that we build up and we can say circle 
+that longitude latitude radius and
+
+0:45:14.160,0:45:16.720
+and these are all the numbers that we passed 
+in and then we say we want to use miles
+
+0:45:17.440,0:45:22.640
+uh this could be miles this could be kilometers 
+this could be uh feet this could be meters i use
+
+0:45:22.640,0:45:28.240
+miles and then we return all so uh what this will 
+do is we pick a point in the globe and then say
+
+0:45:28.880,0:45:36.000
+find everyone within 20 miles of this point which 
+is kind of cool so let's uh let's test that out
+
+0:45:37.280,0:45:44.320
+so we got uh try it out we're going to look for 
+every people that are at um let's let's just do
+
+0:45:44.320,0:45:48.960
+0.0 zero and those just do really long distances 
+so we'll start with null island which is
+
+0:45:48.960,0:45:53.840
+off the coast of africa here which is not a 
+real place uh so latitude longitude zero zero
+
+0:45:53.840,0:45:57.280
+there's a buoy there and that's about 
+it and if we search for like a 20 mile
+
+0:45:57.280,0:46:00.640
+radius we're not going to find anyone because 
+there's nothing within 20 miles of that so
+
+0:46:00.640,0:46:04.240
+see we've got an empty response there so 
+let's go with like a 2 000 mile radius
+
+0:46:06.080,0:46:10.240
+still haven't found anyone because it's pretty 
+far from things let's go with a 5 000 mile radius
+
+0:46:11.840,0:46:15.680
+okay so we found rupert holmes that's who i 
+figured we'd find uh because he's in the uk
+
+0:46:16.800,0:46:21.760
+and so we uh he he's in that location if 
+we widen even further we could probably get
+
+0:46:22.720,0:46:24.080
+someone in the united states here
+
+0:46:27.280,0:46:35.680
+uh oh dropped it to a thousand we got 
+ten thousand so that yeah so now we're
+
+0:46:35.680,0:46:38.480
+getting some americans here this is jon 
+ja and it's probably just about everyone
+
+0:46:39.600,0:46:45.840
+so um so yeah so that's how you can do a geo 
+search where say hey i'm at a point i want to find
+
+0:46:45.840,0:46:50.960
+the people around me um that could be useful if 
+you're at a location and you're using this app and
+
+0:46:50.960,0:46:55.600
+you want to find your buddies right it's like oh 
+who's who's around me who's within you know half
+
+0:46:55.600,0:47:03.680
+a mile of me or you know 500 feet or whatever so 
+that's pretty much uh search but um i want to add
+
+0:47:03.680,0:47:08.160
+just a little bit more to the app because i think 
+it'd be kind of cool i want to add this sort of
+
+0:47:08.160,0:47:13.280
+location tracking ability so what that means 
+is i can't just have a straight up update right
+
+0:47:13.280,0:47:17.840
+i i need to something that comes in and says 
+report my location right now okay maybe i've
+
+0:47:17.840,0:47:23.520
+checked in at an ice cream stand and then then i 
+go to like a museum and i you know i want to check
+
+0:47:23.520,0:47:27.840
+in there and so i i update my location again or 
+maybe i've got an app that's updating my location
+
+0:47:27.840,0:47:33.120
+periodically so that my friends know where i'm at 
+and so um you could call the little update method
+
+0:47:33.120,0:47:36.320
+here that i created but it updates everything 
+and we really just want to update one thing
+
+0:47:37.200,0:47:41.040
+and so and there's a little bit of behavior 
+to that too because we've got an updated date
+
+0:47:41.040,0:47:45.120
+for your location we've got a location updated 
+last time you updated that location and we have
+
+0:47:45.120,0:47:51.440
+the location and so this feels like something that 
+needs to be its own api call so i've created that
+
+0:47:51.440,0:47:57.200
+here it's got a person um you go to the person 
+slash id location and then longitude and latitude
+
+0:47:57.760,0:48:05.840
+and so this is a little interface for it uh 
+let's go ahead and get to the code to do that
+
+0:48:06.880,0:48:12.720
+so first off i'm going to create a new router 
+called location router and it's going to have
+
+0:48:12.720,0:48:18.560
+uh the same url that we just saw in swagger so 
+the slash person slash id location and then the
+
+0:48:18.560,0:48:22.720
+longitude and latitude and again we're pulling 
+those arguments out of the params from that uh
+
+0:48:22.720,0:48:28.320
+call from express and then we're going to set the 
+updated date for the location to be uh the current
+
+0:48:28.880,0:48:34.160
+right now we're going to create a new date and 
+it's like make the updated date right now then
+
+0:48:34.160,0:48:40.240
+we fetch the person by that id that we were passed 
+we set the location to the longitude and latitude
+
+0:48:40.240,0:48:45.920
+that they were passed in we set the location 
+updated to that newly created date and then
+
+0:48:45.920,0:48:52.400
+we save the person and then this will then update 
+them then we return the id and the date and where
+
+0:48:52.400,0:49:00.320
+they said they were at so we return the data back 
+to them and then we need to map this in server.js
+
+0:49:00.320,0:49:06.080
+so let's go ahead and do that so we'll bring in 
+that location router and we'll add it to person
+
+0:49:07.920,0:49:12.240
+and so now we should be able to hit this 
+url and update a person's location so
+
+0:49:13.120,0:49:19.200
+who's the last person we got let's uh 
+let's get all the people here find someone
+
+0:49:20.240,0:49:22.080
+let's get joan jet let's move her around
+
+0:49:25.200,0:49:29.840
+and we'll leave we'll leave 
+her up because i want to
+
+0:49:32.400,0:49:35.520
+paste that there i want to 
+copy her latitude and longitude
+
+0:49:36.240,0:49:43.840
+as well so she's at minus 75 and 
+positive 40. that's close enough
+
+0:49:44.560,0:49:51.120
+minus 75 and she's at positive 40. and 
+so if i execute that that'll update her
+
+0:49:51.120,0:49:59.600
+location to be exactly that now and so if we 
+hit our little uh person id and search for her
+
+0:50:02.000,0:50:05.840
+you can see that her loca longitude and latitude 
+have now been updated and we will be able to see
+
+0:50:05.840,0:50:14.320
+this this in redis as well it's fine there she 
+is so minus 75 comma 40. and if we update it
+
+0:50:14.320,0:50:19.040
+again then we'll update it again if we look at the 
+date there we see the unix timestamp is something
+
+0:50:19.040,0:50:25.120
+a little more it has less zeros at the end of it 
+which tells us that it's not a nice round date and
+
+0:50:25.120,0:50:32.560
+we look here it's uh the current date i clearly 
+recorded this on march the 14th happy pi day um
+
+0:50:34.960,0:50:40.480
+so cool that updated that's great so we've 
+got this little thing right it updates their
+
+0:50:40.480,0:50:44.880
+current location updates their little record 
+and write a song that json document but
+
+0:50:46.000,0:50:48.640
+i want to go a little bit further because
+
+0:50:50.400,0:50:53.200
+one of the things you have when you have like this 
+tracking app is you don't want just their current
+
+0:50:53.200,0:50:57.360
+location to be nice to track their history right 
+so this is where they were and this is where they
+
+0:50:57.360,0:51:01.120
+were next and this is where they were next like 
+you know location i checked in here and i checked
+
+0:51:01.120,0:51:06.000
+into this other place and i checked into this 
+third place and so how do we do that with redisome
+
+0:51:06.000,0:51:11.920
+well the answer is that we don't redisome doesn't 
+do that but redis does redis has a streaming data
+
+0:51:11.920,0:51:17.840
+type uh where we can show up streaming data if 
+you're not familiar with streams go check out you
+
+0:51:17.840,0:51:22.080
+know there's lots of information on streaming data 
+types out on the internet you can think of them
+
+0:51:22.080,0:51:29.520
+as a log of hashes uh with a time stamp and uh 
+the ha the hash containing key value paired data
+
+0:51:31.120,0:51:38.800
+and um it's um it's like a law it's like a log 
+file it's a a bunch of events that have occurred
+
+0:51:38.800,0:51:42.320
+so at this point this event current here's a 
+bunch of data about it at this point here's
+
+0:51:42.320,0:51:47.440
+an event data and at this point there's this 
+event data redis has one of those but redison
+
+0:51:47.440,0:51:55.040
+can't use it but we can fix that because we can 
+step underneath retisom and use the underlying
+
+0:51:55.040,0:52:02.320
+redis client node redis to do this ourselves so 
+how do we do that well we're going to go back to
+
+0:52:02.320,0:52:08.160
+our client remember client.js 
+all those years ago so before
+
+0:52:10.880,0:52:14.560
+we just had this we got our url we call 
+client.open pass in the url and export it
+
+0:52:16.480,0:52:20.960
+now we are importing from redis this is node redis
+
+0:52:21.600,0:52:26.480
+uh the create client function and instead 
+of using uh our new client passing it open
+
+0:52:26.480,0:52:33.200
+uh we use the create client from redis to create 
+what i'm calling a connection uh but but redis
+
+0:52:33.200,0:52:37.040
+node redis calls a client as well so 
+i call a connection to disambiguate
+
+0:52:38.640,0:52:44.480
+but they're both clients and this is a node 
+redis instance that we can do anything that
+
+0:52:44.480,0:52:50.320
+redis can do against and so we create a client 
+passing in that url we connect to that client
+
+0:52:50.880,0:52:57.040
+calling connect and then instead of opening on our 
+client we just tell it to use that connection so
+
+0:52:57.920,0:53:01.520
+we're just saying we create a new client and 
+say use the connection instead of calling open
+
+0:53:02.240,0:53:10.080
+and boom we are now you we now have a redis 
+connection a node redis connection and we have a
+
+0:53:10.080,0:53:16.080
+redisome client and they are coexisting peacefully 
+they're both using this exact same connection
+
+0:53:16.080,0:53:20.560
+uh this is handy if you want to access commands 
+on redis that you don't have access to otherwise
+
+0:53:20.560,0:53:25.200
+from writism it's also handy if you're using 
+retisome and you wanna use it to connect to
+
+0:53:25.200,0:53:29.600
+redis in more sophisticated ways than just a 
+simple url there's lots and lots and lots of
+
+0:53:29.600,0:53:35.680
+options for how you can connect to redis and you 
+can access all those with node redis and so this
+
+0:53:35.680,0:53:41.840
+allows you to do this it's the advanced uh way 
+of connecting so now we've got a client that uses
+
+0:53:43.120,0:53:49.840
+noderetis explicitly and we've exported our 
+redisconnect our redis connection from noderedis
+
+0:53:49.840,0:53:54.880
+as well as our redison client so now that we've 
+done that we can start doing redis things so let's
+
+0:53:54.880,0:54:00.960
+take a look at our location router again and let's 
+look at the last change we're going to make here
+
+0:54:02.560,0:54:10.240
+i bring in that connection from from the 
+client.js i've added one line of code here
+
+0:54:10.240,0:54:16.560
+i'm calling connection.x add that means stream 
+ad add something to a stream i'm giving it a key
+
+0:54:16.560,0:54:22.080
+name for that stream that key name is going to be 
+the person key so that'd be the person colon ulid
+
+0:54:23.520,0:54:26.560
+there's a little keyname property 
+on entity that's created that's very
+
+0:54:26.560,0:54:33.200
+useful for this purpose and then we just tack 
+on a location history and so we're saying add to
+
+0:54:33.200,0:54:41.360
+the a stream in this key and if it doesn't exist 
+it'll create it add a timestamp of star that means
+
+0:54:42.240,0:54:47.440
+generate your own stream id the stream id 
+is made up of a time stamp a unix timestamp
+
+0:54:47.440,0:54:52.560
+dash and then a serial number in case there's 
+more than one thing per millisecond star just
+
+0:54:52.560,0:54:56.240
+means do all that automatically use the server to 
+do it we don't want to mess with it that's almost
+
+0:54:56.240,0:55:02.560
+always what you want to do and then we pass 
+in uh a javascript object with uh name value
+
+0:55:02.560,0:55:08.560
+pairs in it uh location is made up of longitude 
+and latitude here right so we can just pass that
+
+0:55:08.560,0:55:14.400
+in as is and that will update uh the latitude 
+and longitude for that user every single time
+
+0:55:14.400,0:55:21.760
+we call this route so let's uh let's do that again 
+let's let's take joan jett and update her location
+
+0:55:26.160,0:55:30.480
+to be let's see she's at minus 
+75 let's put it minus 75.1
+
+0:55:31.760,0:55:38.960
+and we'll do minus 75.2 and then we'll move 
+her uh north a little bit she's heading west
+
+0:55:38.960,0:55:43.120
+now she needs to head head north and 
+then she's going to head northwest
+
+0:55:45.120,0:55:52.320
+there we go moving kind of fast there but you know 
+such as it is so if we uh go out into redis and
+
+0:55:52.320,0:56:00.160
+look we can see that john jeff's location is now 
+updated but if we refresh our key list we'll see
+
+0:56:00.160,0:56:06.640
+there's a stream here and it's got that name 
+just as we defined it person called eulid on
+
+0:56:06.640,0:56:12.160
+location history so uh to access the stream 
+well we could click on it but it just tells us
+
+0:56:12.160,0:56:17.680
+that this data type isn't supported in a pretty 
+way yet but we can totally access it from the
+
+0:56:17.680,0:56:22.880
+cli if we go here so i'm going to copy 
+this key name just for my convenience
+
+0:56:26.640,0:56:30.400
+and then we go over to the workbench and we can 
+just enter redis commands and so we're going to do
+
+0:56:31.600,0:56:35.120
+x range x range reads a stream
+
+0:56:37.200,0:56:47.440
+by the key name from a start stream id to an end 
+stream id or event id um i want all of them so i'm
+
+0:56:47.440,0:56:52.320
+just going to do minus for the beginning of time 
+and plus for the end of time and when i run that
+
+0:56:53.920,0:56:59.520
+we see that there is the most the the older 
+records are here so the longitude was 75.1 and
+
+0:56:59.520,0:57:08.320
+40. 75.2 and 40. uh then she started moving 
+uh um north and then moved northwest so you
+
+0:57:08.320,0:57:13.840
+can see that entire history of all those uh 
+movements so now we've got a log pretty cool
+
+0:57:14.720,0:57:21.920
+so um that's pretty much all i've got um so i 
+guess this is the part where i say thanks for
+
+0:57:21.920,0:57:26.960
+hanging out with me and working on this and i hope 
+it was useful um you've got a decent bit of sample
+
+0:57:26.960,0:57:32.960
+code sitting on your computer now that you can use 
+to do uh redisome and a little bit more to really
+
+0:57:32.960,0:57:41.360
+build a basic api or even a very sophisticated api 
+uh using redis redisome read a stack and express
+
+0:57:41.360,0:57:47.520
+so um thanks for hanging out with me doing this 
+and uh if you have any questions leave them in the
+
+0:57:47.520,0:57:55.440
+comments or uh or better yet go to discord.gigi 
+redis which is our redis discord server i'm always
+
+0:57:55.440,0:58:07.652
+on there and ask questions there and i'll be happy 
+to answer them and yeah see you next time [Music]

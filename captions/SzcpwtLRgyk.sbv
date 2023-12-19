@@ -1,0 +1,391 @@
+0:00:00.960,0:00:09.520
+oh the air in here is not ideal if only i could 
+go back in time and monitor the air quality and
+
+0:00:09.520,0:00:11.760
+have it warn me to close the windows
+
+0:00:13.280,0:00:19.600
+wait there is a way to do that red is time 
+series to the rescue let's check it out
+
+0:00:19.600,0:00:25.360
+[Applause] [Music]
+
+0:00:25.360,0:00:30.320
+redis time series is a component of redis stack 
+that has a time series data structure to redis
+
+0:00:30.880,0:00:35.520
+as you'd expect from redis redis time series 
+can quickly ingest data samples while still
+
+0:00:35.520,0:00:40.960
+providing low latency reads and of course there's 
+a suite of commands that allow you to tailor your
+
+0:00:40.960,0:00:46.560
+data for real-time tracking secondary indexing 
+and even control over the data structure's size
+
+0:00:47.200,0:00:49.200
+let's spend some time covering the basics
+
+0:00:50.800,0:00:55.120
+for today's example we'll be taking sensor 
+readings of the air quality around my house to
+
+0:00:55.120,0:00:58.800
+alert us when we need to close the windows 
+due to smoke or particulates in the air
+
+0:01:02.080,0:01:07.680
+we'll use a wi-fi enabled raspberry pi compute 
+unit attached to an air sensor to take a sniff
+
+0:01:07.680,0:01:12.880
+every second outside my house we'll create two 
+of these remote sensors to track the quality of
+
+0:01:12.880,0:01:18.800
+the front and back of the house we then send each 
+device's readings to redis time series which is
+
+0:01:18.800,0:01:24.800
+hosted on redis cloud we can then create a service 
+to monitor the values and send an alert when the
+
+0:01:24.800,0:01:31.280
+threshold of clean air has been passed time series 
+commands are prefixed with ts dot followed by the
+
+0:01:31.280,0:01:36.400
+actual command to create a time series in redis 
+use the create command followed by the key name
+
+0:01:37.200,0:01:43.600
+for our two sensors we'll use dash sensor 
+colon 1 and particulate dash sensor colon 2.
+
+0:01:44.480,0:01:49.280
+we are now able to make a few decisions about our 
+object's behavior with some optional sub commands
+
+0:01:50.160,0:01:55.280
+adding the retention option allows us to set 
+how long in milliseconds previous events are
+
+0:01:55.280,0:02:00.000
+kept since the most recent event insertion 
+let's say we want to keep the most recent
+
+0:02:00.000,0:02:05.360
+seven days of sensor readings we'll want to set 
+the retention time to six hundred and four million
+
+0:02:05.360,0:02:10.880
+eight hundred thousand milliseconds chunk 
+size specifies the initial amount of memory
+
+0:02:10.880,0:02:17.600
+reserved for our time series the default is 4096 
+kilobytes but we can choose any multiple of eight
+
+0:02:18.480,0:02:22.320
+the size will double as more space 
+is needed for the data structure
+
+0:02:22.320,0:02:27.840
+we'll set the initial chunk size to 16192 
+to give us plenty of space to work with
+
+0:02:28.800,0:02:34.000
+duplicate policy lets us decide what to do if 
+a sample with the same timestamp is inserted
+
+0:02:34.000,0:02:38.880
+should we go with the default and block it should 
+we replace it with the newer one replace it if
+
+0:02:38.880,0:02:45.120
+it's larger add the values together the decision 
+is unique to each use case and for our particular
+
+0:02:45.120,0:02:50.080
+case we can choose to replace the sample with the 
+newest reading just in case we want to replace
+
+0:02:50.080,0:02:55.840
+obvious errors with an average value lastly 
+we can add label value pairs to the key for
+
+0:02:55.840,0:03:02.080
+secondary indexing this will help with querying 
+which we'll cover later on now that we have our
+
+0:03:02.080,0:03:08.640
+two time series created we can add samples using 
+the add command we call add then the specific key
+
+0:03:08.640,0:03:12.480
+then we include a timestamp in milliseconds 
+that we want to associate with a sample
+
+0:03:13.120,0:03:18.400
+we can also use an asterisk to let reddit set the 
+timestamp based on the redis server system clock
+
+0:03:19.120,0:03:25.440
+we can also use add to instantiate a new time 
+series object and add an initial value retention
+
+0:03:25.440,0:03:30.400
+chunk size duplicate policy labels and all other 
+options are also available at this point as well
+
+0:03:31.440,0:03:36.000
+as we use our time series and observance 
+behavior over time we might need to adjust
+
+0:03:36.000,0:03:41.040
+a few key specific settings that better suit 
+our needs if we need to update the options
+
+0:03:41.040,0:03:46.000
+assigned to an existing time series such as the 
+retention time duplicate policy and the existing
+
+0:03:46.000,0:03:51.440
+labels we can use the alter command we can do 
+this by calling alter with the key we want to
+
+0:03:51.440,0:03:56.720
+update and the options we want to change note 
+that any changes you make with alter replaces the
+
+0:03:56.720,0:04:03.520
+previous configuration of your time series a time 
+series often contains a large quantity of samples
+
+0:04:04.080,0:04:08.240
+we may want to retrieve a portion of our time 
+series to view only samples representing a
+
+0:04:08.240,0:04:14.560
+specific hour day or time frame of our choosing 
+to get samples for a given time period from a time
+
+0:04:14.560,0:04:20.640
+series we use the range command this command's 
+parameters include start and end timestamps
+
+0:04:20.640,0:04:24.560
+these specify the boundaries in which we 
+want to retrieve the time-stamped samples
+
+0:04:25.360,0:04:30.720
+range has some options that help us get insights 
+into our time series samples we can use filter
+
+0:04:30.720,0:04:36.160
+by value with the min and max value pair to 
+only receive the timestamps and samples within
+
+0:04:36.160,0:04:43.360
+those two values inclusively using the air quality 
+sensors example i can call range on a time series
+
+0:04:43.360,0:04:50.080
+with the filter by value option when i specify 
+a minimum value of 51 and a maximum value of 100
+
+0:04:50.080,0:04:55.040
+i'll get a result containing samples where air 
+quality was in that range this is considered to
+
+0:04:55.040,0:05:02.000
+be moderate air quality if i filter for values 
+between 101 and 150 i would receive all the time
+
+0:05:02.000,0:05:09.280
+stamps that have unhealthy air quality values 
+lastly with the range commands aggregation option
+
+0:05:09.280,0:05:15.760
+we can aggregate values of our specified time 
+range to find the sum the maximum the minimum
+
+0:05:17.120,0:05:23.040
+and the average this is great for taking samples 
+from your time series without computing aggregate
+
+0:05:23.040,0:05:28.800
+values from the entire set of data points yourself 
+it should be noted that there is also a rev range
+
+0:05:28.800,0:05:34.240
+command that works exactly as a range command 
+only in reverse this means that the range will
+
+0:05:34.240,0:05:39.600
+by default travel from the most recent values 
+to the oldest this is preferable if you want to
+
+0:05:39.600,0:05:43.840
+traverse recent timestamps more often than 
+ones near the beginning of the time series
+
+0:05:44.720,0:05:49.520
+the range commands are great for when we want a 
+specific zoomed in view of the samples or want to
+
+0:05:49.520,0:05:55.200
+retrieve a specified sample range as a computed 
+average as an example if we're sending our time
+
+0:05:55.200,0:06:00.320
+series to a monitoring service such as grafana 
+or prometheus the range command would be called
+
+0:06:00.320,0:06:05.840
+anytime we want to inspect our samples through a 
+rolling 24-hour period or the last hourly average
+
+0:06:06.480,0:06:11.680
+one of the more interesting and useful commands 
+within the redis time series module is create rule
+
+0:06:12.480,0:06:17.520
+this command adds timestamps and samples from 
+one time series to a second time series in an
+
+0:06:17.520,0:06:24.240
+aggregated form this is great for data compaction 
+and custom value tracking let's say i want to see
+
+0:06:24.240,0:06:30.160
+a graphical representation of the samples for my 
+two air quality sensors i can connect redis to
+
+0:06:30.160,0:06:36.960
+grfada a data visualization platform to see the 
+air quality over time this is great but quite
+
+0:06:36.960,0:06:41.600
+costly for graffana to consume a day's worth of 
+samples from my time series to create this view
+
+0:06:43.520,0:06:49.840
+we'll create a new time series called particulate 
+sensor colon 1 colon average colon 10 store
+
+0:06:49.840,0:06:55.120
+average values in 10 minute time buckets from 
+our original particulate sensor 1 time series
+
+0:06:56.000,0:06:59.440
+we call create rule with the 
+destination key the target key
+
+0:06:59.440,0:07:03.840
+the aggregation option with the aggregation 
+type and time bucket in milliseconds
+
+0:07:04.400,0:07:09.920
+here i am choosing average and 600 000 
+milliseconds or 10 minutes the new time
+
+0:07:09.920,0:07:14.560
+series will now take the average of the last 10 
+minutes of samples and create a single data point
+
+0:07:15.440,0:07:20.240
+there will be fewer samples in this time 
+series but this is perfect for data compaction
+
+0:07:20.240,0:07:25.600
+where we're not interested in the granular values 
+but more of an overview this is especially great
+
+0:07:25.600,0:07:31.040
+for visualizations as the view is less crowded 
+the size of the time series is smaller and
+
+0:07:31.040,0:07:37.200
+the rendering takes less time there are many 
+other aggregation types such as sample count
+
+0:07:37.200,0:07:43.680
+sum of values min max values standard deviations 
+and variances of sample sets and populations
+
+0:07:43.680,0:07:47.920
+make sure to check the documentation for the 
+full rundown of every command and its options
+
+0:07:48.960,0:07:54.320
+let's expand on the air sensor example a little 
+imagine we had a large fleet of air sensors
+
+0:07:54.320,0:07:59.440
+dispersed throughout our town maybe we'd like to 
+search for sensors that might have certain zip
+
+0:07:59.440,0:08:05.360
+codes street names districts or location types 
+such as residential commercial or industrial
+
+0:08:06.240,0:08:12.000
+the redis time series has a query index command 
+that could help of such a search this allows us
+
+0:08:12.000,0:08:17.680
+to query across all the time series keys to find 
+matching or non-matching labels and values here
+
+0:08:17.680,0:08:22.320
+are a few of the query filters that you can use 
+with the labels these are great if you want a
+
+0:08:22.320,0:08:27.840
+list of all the keys at the same label value but 
+not necessarily all the values with only one key
+
+0:08:29.280,0:08:34.000
+we've only just scratched the surface of what 
+redis time series can do with time-stamped samples
+
+0:08:34.640,0:08:40.080
+finance and stock market analysis real-time 
+device monitoring factory production tracking
+
+0:08:40.080,0:08:44.960
+historical data analysis the possibilities 
+are limited only by your imagination
+
+0:08:45.600,0:08:49.760
+if you would like to learn more about the redis 
+time series module including more commands and
+
+0:08:49.760,0:08:54.640
+options not included in this video head 
+over to our documentation at redis.io
+
+0:08:56.000,0:09:00.400
+you can always sign up for a free redis stack 
+database in the cloud to start experimenting
+
+0:09:00.400,0:09:05.280
+with redis time series so the next time you 
+find that you're inundated with information
+
+0:09:05.280,0:09:10.160
+and want to keep track of everything let retta's 
+time series do the heavy lifting for you you'll
+
+0:09:10.160,0:09:21.840
+watch an amazement just what you'll be able to 
+accomplish breathe easy i'll see you next time
+
+0:09:21.840,0:09:22.674
+[Applause] [Music]
