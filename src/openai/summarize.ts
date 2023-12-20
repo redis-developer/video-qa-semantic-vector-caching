@@ -6,10 +6,9 @@ import {
     SUMMARY_PROMPT,
     SUMMARY_REFINE_PROMPT,
 } from '../templates/index.js';
-import { loadSummarizationChain, loadQARefineChain } from 'langchain/chains';
+import { loadSummarizationChain } from 'langchain/chains';
 import { llm } from './config.js';
 import { StringOutputParser } from 'langchain/schema/output_parser';
-import { wait } from '../utils.js';
 import { cacheAside } from '../db.js';
 
 const splitter = new TokenTextSplitter({

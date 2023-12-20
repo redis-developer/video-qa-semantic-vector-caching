@@ -1,7 +1,21 @@
+import * as summarize from './summarize.js';
 import { VideoDocument } from 'src/transcripts/load.js';
 import { vectorStore } from './config.js';
 
-export async function search(search: string): Promise<VideoDocument[]> {
+async function getVideos(question: string) {
     const KNN = 3;
-    return vectorStore.similaritySearch(search, KNN) as Promise<VideoDocument[]>;
+    /* Simple standalone search in the vector DB */
+    return vectorStore.similaritySearch(question, KNN) as Promise<
+        VideoDocument[]
+    >;
+}
+
+export async function search(question: string) {
+    console.log(`Original question: ${question}`);
+    const semanticQuestion = await summarize.question(question);
+
+    console.log(`Semantic question: ${semanticQuestion}`);
+    const videos = await getVideos(semanticQuestion);
+
+    return videos;
 }

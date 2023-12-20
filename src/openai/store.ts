@@ -10,7 +10,7 @@ export async function store(
     const newDocuments: VideoDocument[] = [];
 
     await Promise.all(documents.map(async (doc) => {
-        const exists = await client.sIsMember(config.redis.VECTOR_SET, doc.metadata.id);
+        const exists = await client.sIsMember(config.openai.VECTOR_SET, doc.metadata.id);
 
         if (!exists) {
             newDocuments.push(doc);
@@ -26,6 +26,6 @@ export async function store(
     await vectorStore.addDocuments(newDocuments);
 
     await Promise.all(newDocuments.map(async (doc) => {
-        await client.sAdd(config.redis.VECTOR_SET, doc.metadata.id);
+        await client.sAdd(config.openai.VECTOR_SET, doc.metadata.id);
     }));
 }

@@ -24,6 +24,6 @@ export function getEmbeddings(modelName?: string) {
 
 export const vectorStore = new RedisVectorStore(getEmbeddings(), {
     redisClient: client,
-    indexName: config.redis.VIDEO_INDEX_NAME,
-    keyPrefix: config.redis.VIDEO_PREFIX,
+    indexName: config.openai.VIDEO_INDEX_NAME,
+    keyPrefix: config.openai.VIDEO_PREFIX,
 });

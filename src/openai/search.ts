@@ -1,11 +1,13 @@
 import * as summarize from './summarize.js';
-import { llm, vectorStore } from './config.js';
+import { VideoDocument } from 'src/transcripts/load.js';
+import { vectorStore } from './config.js';
 
 async function getVideos(question: string) {
-    console.log('Getting OpenAI Embeddings');
     const KNN = 3;
     /* Simple standalone search in the vector DB */
-    return vectorStore.similaritySearch(question, KNN);
+    return vectorStore.similaritySearch(question, KNN) as Promise<
+        VideoDocument[]
+    >;
 }
 
 export async function search(question: string) {

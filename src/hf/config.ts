@@ -15,7 +15,7 @@ export const vectorStore = new RedisVectorStore(
     embeddings,
     {
         redisClient: client,
-        indexName: config.redis.VIDEO_INDEX_NAME,
-        keyPrefix: config.redis.VIDEO_PREFIX,
+        indexName: config.hf.VIDEO_INDEX_NAME,
+        keyPrefix: config.hf.VIDEO_PREFIX,
     }
 );
