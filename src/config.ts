@@ -11,6 +11,7 @@ export default {
         VIDEO_INDEX_NAME: 'idx-videos',
         VIDEO_PREFIX: 'video:',
         REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
+        VECTOR_SET: 'video-vectors'
     },
     search: {
         API_KEY: process.env.SEARCHAPI_API_KEY ?? '',
