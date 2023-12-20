@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
+    "format": "prettier --write .",
     "build": "tsc -p .",
     "start": "npm run build && node dist/index.js"
   },
@@ -25,6 +26,7 @@
     "@types/node": "^20.10.5",
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.2",
+    "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   },
   "author": "",

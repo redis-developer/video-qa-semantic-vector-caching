@@ -1,4 +1,4 @@
-import { PromptTemplate } from "langchain/prompts";
+import { PromptTemplate } from 'langchain/prompts';
 
 const questionTemplate = `
 You are an expert in summarizing questions.

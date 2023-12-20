@@ -1,4 +1,4 @@
-import { PromptTemplate } from "langchain/prompts";
+import { PromptTemplate } from 'langchain/prompts';
 
 const summaryTemplate = `
 You are an expert in summarizing YouTube videos.
@@ -41,5 +41,5 @@ SUMMARY AND QUESTIONS:
 `;
 
 export const SUMMARY_REFINE_PROMPT = PromptTemplate.fromTemplate(
-  summaryRefineTemplate
+  summaryRefineTemplate,
 );
