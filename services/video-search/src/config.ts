@@ -22,6 +22,9 @@ export default {
   app: {
     NAME: process.env.npm_package_name ?? 'video-search',
     VERSION: process.env.npm_package_version ?? '0.0.0',
+    FULL_NAME: `${process.env.npm_package_name ?? 'video-search'}@${
+      process.env.npm_package_version ?? '0.0.0'
+    }`,
     PORT: process.env.PORT ?? 3001,
   },
   log: {

@@ -17,7 +17,7 @@ async function summarizeText(text: string) {
 
   const response = await generator(text);
 
-  return response?.[0]?.summary_text;
+  return response?.[0]?.summary_text as string;
 }
 
 export async function docs(allDocs: VideoDocument[][]) {

@@ -7,7 +7,6 @@ import log from '../log.js';
 
 export type VideoDocument = Document<{
   id: string;
-  fileName: string;
   link: string;
 }>;
 
@@ -25,7 +24,6 @@ async function getTranscript(video: string) {
       new Document({
         metadata: {
           id: video,
-          fileName: video,
           link: `https://www.youtube.com/watch?v=${video}`,
         },
         pageContent: existingTranscript,
@@ -42,7 +40,6 @@ async function getTranscript(video: string) {
   const docs: VideoDocument[] = (await loader.load()).map((doc) => {
     doc.metadata = {
       id: video,
-      fileName: video,
       link: `https://www.youtube.com/watch?v=${video}`,
     };
 
@@ -54,6 +51,6 @@ async function getTranscript(video: string) {
   return docs;
 }
 
-export async function load() {
-  return mapAsyncInOrder(config.youtube.VIDEOS, getTranscript);
+export async function load(videos: string[] = config.youtube.VIDEOS) {
+  return mapAsyncInOrder(videos, getTranscript);
 }

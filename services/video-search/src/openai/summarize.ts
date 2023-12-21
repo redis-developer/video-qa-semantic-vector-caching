@@ -67,7 +67,7 @@ export async function docs(allDocs: VideoDocument[][]) {
 }
 
 export async function question(question: string) {
-  const summary = questionSummarizeChain.invoke({
+  const summary = await questionSummarizeChain.invoke({
     question,
   });
 
