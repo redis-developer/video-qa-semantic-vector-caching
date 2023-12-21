@@ -2,6 +2,7 @@ import config from './config.js';
 import * as openai from './openai/index.js';
 import * as hf from './hf/index.js';
 import * as transcripts from './transcripts/index.js';
+import log from './log.js';
 
 const question =
   'I am new to Redis, I understand a little bit about using Redis for caching. However, I would like to learn more about Redis Streams. Can you help me with that?';
@@ -16,10 +17,20 @@ try {
   await store(summaries);
   const result = await search(question);
 
-  console.log(result.map((r) => r.metadata.link));
+  log.info('Results for question', {
+    question,
+    results: result.map((r) => r.metadata.link),
+    location: 'script',
+  });
 
   process.exit();
 } catch (e) {
-  console.log(e);
+  log.error('Unexpected error in script', {
+    error: {
+      message: (e as Error).message,
+      stack: (e as Error).stack,
+    },
+    location: 'script',
+  });
   process.exit(1);
 }

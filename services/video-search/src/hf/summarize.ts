@@ -4,6 +4,7 @@ import { VideoDocument } from '../transcripts/load.js';
 import { cacheAside } from '../db.js';
 import { pipeline } from '@xenova/transformers';
 import config from '../config.js';
+import log from '../log.js';
 
 export async function queryEmbeddings(text: string): Promise<number[]> {
   return embeddings.embedQuery(text);
@@ -23,7 +24,10 @@ export async function docs(allDocs: VideoDocument[][]) {
   const summarizedDocs: VideoDocument[] = [];
 
   for (const docs of allDocs) {
-    console.log(`Summarizing ${docs[0].metadata.link}`);
+    log.debug(`Summarizing ${docs[0].metadata.link}`, {
+      ...docs[0].metadata,
+      location: 'hf.summarize.docs',
+    });
     const existingSummary = await cache.get(docs[0].metadata.id);
 
     if (existingSummary) {

@@ -2,9 +2,12 @@ import { client } from '../db.js';
 import { vectorStore } from './config.js';
 import { VideoDocument } from '../transcripts/load.js';
 import config from '../config.js';
+import log from '../log.js';
 
 export async function store(documents: VideoDocument[]) {
-  console.log('Storing documents...');
+  log.debug('Storing documents...', {
+    location: 'hf.store.store',
+  });
   const newDocuments: VideoDocument[] = [];
 
   await Promise.all(
@@ -20,7 +23,9 @@ export async function store(documents: VideoDocument[]) {
     }),
   );
 
-  console.log(`Found ${newDocuments.length} new documents`);
+  log.debug(`Found ${newDocuments.length} new documents`, {
+    location: 'hf.store.store',
+  });
 
   if (newDocuments.length === 0) {
     return;

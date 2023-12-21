@@ -1,25 +1,12 @@
+//Note: Sample http proxy as api-gateway for demo purpose (only)
 import config from './config.js';
-import * as openai from './openai/index.js';
-import * as hf from './hf/index.js';
-import * as transcripts from './transcripts/index.js';
+import app from './app.js';
+import log from './log.js';
 
-const question =
-  'I am new to Redis, I understand a little bit about using Redis for caching. However, I would like to learn more about Redis Streams. Can you help me with that?';
+app.set('port', config.app.PORT);
 
-const summarize = config.use.OPENAI ? openai.summarize : hf.summarize;
-const store = config.use.OPENAI ? openai.store : hf.store;
-const search = config.use.OPENAI ? openai.search : hf.search;
-
-try {
-  const videos = await transcripts.load();
-  const summaries = await summarize.docs(videos);
-  await store(summaries);
-  const result = await search(question);
-
-  console.log(result.map((r) => r.metadata.link));
-
-  process.exit();
-} catch (e) {
-  console.log(e);
-  process.exit(1);
-}
+app.listen(config.app.PORT, async () => {
+  log.info(`Server is running at http://localhost:${app.get('port')}`, {
+    location: 'index',
+  });
+});

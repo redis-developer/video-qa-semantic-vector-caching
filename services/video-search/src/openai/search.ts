@@ -1,6 +1,7 @@
 import * as summarize from './summarize.js';
-import { VideoDocument } from 'src/transcripts/load.js';
+import { VideoDocument } from '../transcripts/index.js';
 import { vectorStore } from './config.js';
+import log from '../log.js';
 
 async function getVideos(question: string) {
   const KNN = 3;
@@ -11,10 +12,14 @@ async function getVideos(question: string) {
 }
 
 export async function search(question: string) {
-  console.log(`Original question: ${question}`);
+  log.debug(`Original question: ${question}`, {
+    location: 'openai.search.search'
+  });
   const semanticQuestion = await summarize.question(question);
 
-  console.log(`Semantic question: ${semanticQuestion}`);
+  log.debug(`Semantic question: ${semanticQuestion}`, {
+    location: 'openai.search.search'
+  });
   const videos = await getVideos(semanticQuestion);
 
   return videos;

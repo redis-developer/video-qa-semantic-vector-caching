@@ -5,26 +5,42 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc -p .",
-    "start": "npm run build && node dist/index.js"
+    "build": "npm run ts",
+    "dev": "npm run build && run-p watch ts:watch",
+    "serve": "nodemon dist/index.js",
+    "start": "npm run build && node dist/index.js",
+    "ts": "tsc -p .",
+    "ts:watch": "tsc -p . --watch",
+    "watch": "nodemon --watch dist dist/index.js"
   },
   "dependencies": {
     "@tensorflow-models/mobilenet": "^2.1.1",
     "@tensorflow/tfjs": "^4.15.0",
     "@tensorflow/tfjs-node": "^4.15.0",
     "@xenova/transformers": "^2.12.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "fs-extra": "^11.2.0",
     "jpeg-js": "^0.4.4",
     "langchain": "^0.0.210",
+    "morgan": "^1.10.0",
     "redis": "^4.6.12",
-    "redis-om": "^0.4.3"
+    "redis-om": "^0.4.3",
+    "triple-beam": "^1.4.1",
+    "winston": "^3.11.0",
+    "winston-transport": "^4.6.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/fs-extra": "^11.0.4",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.5",
+    "@types/winston": "^2.4.4",
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.2",
+    "npm-run-all": "^4.1.5",
     "typescript": "^5.3.3"
   },
   "author": "",

@@ -2,7 +2,8 @@ import { Document } from 'langchain/document';
 import { SearchApiLoader } from 'langchain/document_loaders/web/searchapi';
 import config from '../config.js';
 import { mapAsyncInOrder } from '../utils.js';
-import { cacheAside, client } from '../db.js';
+import { cacheAside } from '../db.js';
+import log from '../log.js';
 
 export type VideoDocument = Document<{
   id: string;
@@ -13,9 +14,9 @@ export type VideoDocument = Document<{
 const cache = cacheAside('transcripts:');
 
 async function getTranscript(video: string) {
-  console.log(
-    `Getting transcript for https://www.youtube.com/watch?v=${video}`,
-  );
+  log.debug(`Getting transcript for https://www.youtube.com/watch?v=${video}`, {
+    location: 'transcripts.load.getTranscript',
+  });
 
   const existingTranscript = await cache.get(video);
 

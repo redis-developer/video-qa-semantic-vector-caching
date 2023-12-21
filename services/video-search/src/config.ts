@@ -19,6 +19,20 @@ const {
 } = process.env;
 
 export default {
+  app: {
+    NAME: process.env.npm_package_name ?? 'video-search',
+    VERSION: process.env.npm_package_version ?? '0.0.0',
+    PORT: process.env.PORT ?? 3001,
+  },
+  log: {
+    LEVEL: process.env.LOG_LEVEL ?? 'info',
+    STREAM: process.env.LOG_STREAM ?? 'LOGS',
+  },
+  env: {
+    DEV: process.env.NODE_ENV === 'development',
+    PROD: process.env.NODE_ENV === 'production',
+    STAGING: process.env.NODE_ENV === 'staging',
+  },
   youtube: {
     VIDEOS: (
       YOUTUBE_VIDEOS ??
