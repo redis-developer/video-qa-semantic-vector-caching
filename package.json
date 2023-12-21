@@ -5,29 +5,11 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "format": "prettier --write .",
-    "build": "tsc -p .",
-    "start": "npm run build && node dist/index.js"
+    "format": "prettier --write ."
   },
-  "dependencies": {
-    "@tensorflow-models/mobilenet": "^2.1.1",
-    "@tensorflow/tfjs": "^4.15.0",
-    "@tensorflow/tfjs-node": "^4.15.0",
-    "@xenova/transformers": "^2.12.1",
-    "dotenv": "^16.3.1",
-    "fs-extra": "^11.2.0",
-    "jpeg-js": "^0.4.4",
-    "langchain": "^0.0.210",
-    "redis": "^4.6.12",
-    "redis-om": "^0.4.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.10.5",
-    "concurrently": "^8.2.2",
-    "nodemon": "^3.0.2",
-    "prettier": "^3.1.1",
-    "typescript": "^5.3.3"
+    "prettier": "^3.1.1"
   },
   "author": "",
   "license": "ISC"
