@@ -1,6 +1,12 @@
 import 'dotenv/config';
 
 const {
+  npm_package_name,
+  npm_package_version,
+  PORT,
+  LOG_LEVEL,
+  LOG_STREAM,
+  NODE_ENV,
   YOUTUBE_VIDEOS,
   REDIS_URL,
   SEARCHAPI_API_KEY,
@@ -20,21 +26,21 @@ const {
 
 export default {
   app: {
-    NAME: process.env.npm_package_name ?? 'video-search',
-    VERSION: process.env.npm_package_version ?? '0.0.0',
-    FULL_NAME: `${process.env.npm_package_name ?? 'video-search'}@${
-      process.env.npm_package_version ?? '0.0.0'
+    NAME: npm_package_name ?? 'video-search',
+    VERSION: npm_package_version ?? '0.0.0',
+    FULL_NAME: `${npm_package_name ?? 'video-search'}@${
+      npm_package_version ?? '0.0.0'
     }`,
-    PORT: process.env.PORT ?? 3001,
+    PORT: PORT ?? 3001,
   },
   log: {
-    LEVEL: process.env.LOG_LEVEL ?? 'info',
-    STREAM: process.env.LOG_STREAM ?? 'LOGS',
+    LEVEL: LOG_LEVEL ?? 'info',
+    STREAM: LOG_STREAM ?? 'LOGS',
   },
   env: {
-    DEV: process.env.NODE_ENV === 'development',
-    PROD: process.env.NODE_ENV === 'production',
-    STAGING: process.env.NODE_ENV === 'staging',
+    DEV: !!NODE_ENV ? NODE_ENV === 'development' : true,
+    PROD: NODE_ENV === 'production',
+    STAGING: NODE_ENV === 'staging',
   },
   youtube: {
     VIDEOS: (

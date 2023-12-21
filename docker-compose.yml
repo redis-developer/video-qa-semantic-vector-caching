@@ -9,3 +9,18 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+
+  video-search-service:
+    container_name: video-search-service
+    build:
+      context: ./services/video-search
+      dockerfile: Dockerfile
+      args:
+        CWD: services/video-search
+    ports:
+      - '${VS_SVC_PORT}:${VS_SVC_PORT}'
+    env_file:
+      - ./services/video-search/.env
+      - ./.env.video-search
+    depends_on:
+      - redis
