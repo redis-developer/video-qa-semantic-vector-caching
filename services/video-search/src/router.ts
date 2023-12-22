@@ -6,14 +6,22 @@ import * as openai from './openai/index.js';
 import * as transcripts from './transcripts/index.js';
 import log from './log.js';
 
-function getApi() {
-  if (config.use.GOOGLE) {
+function getApi(api?: 'google' | 'hf' | 'openai') {
+  if (typeof api === 'string') {
+    api = api.toLowerCase() as 'google' | 'hf' | 'openai';
+  }
+
+  const useGoogle = api === 'google' || (!api && config.use.GOOGLE);
+  const useHf = api === 'hf' || (!api && config.use.HF);
+  const useOpenai = api === 'openai' || (!api && config.use.OPENAI);
+
+  if (useGoogle) {
     return {
       summarize: google.summarize,
       store: google.store,
       search: google.search,
     };
-  } else if (config.use.HF) {
+  } else if (useHf) {
     return {
       summarize: hf.summarize,
       store: hf.store,
@@ -28,22 +36,56 @@ function getApi() {
   }
 }
 
-const { summarize, store, search } = getApi();
+const defaultApi = getApi();
 
 const router = express.Router();
 
+async function loadVideos({
+  api,
+  videos,
+}: {
+  api: typeof defaultApi;
+  videos: string[];
+}) {
+  log.debug('Loading videos...', {
+    location: 'router.videos.load',
+    videos,
+  });
+
+  const documents = await transcripts.load(videos);
+  const summaries = await api.summarize.docs(documents);
+  await api.store(summaries);
+}
+
+async function search({
+  api,
+  question,
+}: {
+  api: typeof defaultApi;
+  question: string;
+}) {
+  const results = await api.search(question);
+
+  log.info('Results for question', {
+    question,
+    results,
+    location: 'router.videos.search',
+  });
+
+  return results;
+}
+
 router.post('/videos', async (req, res) => {
   const { videos } = req.body as { videos: string[] };
+  const useApi = req.header['x-use-api'] as
+    | 'google'
+    | 'hf'
+    | 'openai'
+    | undefined;
+  const api = getApi(useApi);
 
   try {
-    log.debug('Loading videos...', {
-      location: 'router.videos.load',
-      videos,
-    });
-
-    const documents = await transcripts.load(videos);
-    const summaries = await summarize.docs(documents);
-    await store(summaries);
+    await loadVideos({ api, videos });
 
     res.status(200).json({ message: 'Videos loaded' });
   } catch (e) {
@@ -52,7 +94,7 @@ router.post('/videos', async (req, res) => {
         message: (e as Error).message,
         stack: (e as Error).stack,
       },
-      location: 'router.videos.load',
+      location: 'router.videos.google.load',
     });
 
     res.status(500).json({ error: (e as Error).message });
@@ -61,15 +103,15 @@ router.post('/videos', async (req, res) => {
 
 router.get('/videos/search', async (req, res) => {
   const { question } = req.query as { question: string };
+  const useApi = req.header['x-use-api'] as
+    | 'google'
+    | 'hf'
+    | 'openai'
+    | undefined;
+  const api = getApi(useApi);
 
   try {
-    const results = await search(question);
-
-    log.info('Results for question', {
-      question,
-      results,
-      location: 'router.videos.search',
-    });
+    const results = await search({ api, question });
 
     res.status(200).json({ results });
   } catch (e) {
