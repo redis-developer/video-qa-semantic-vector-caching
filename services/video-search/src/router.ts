@@ -77,7 +77,7 @@ async function search({
 
 router.post('/videos', async (req, res) => {
   const { videos } = req.body as { videos: string[] };
-  const useApi = req.header['x-use-api'] as
+  const useApi = req.headers['x-use-api'] as
     | 'google'
     | 'hf'
     | 'openai'
@@ -103,7 +103,7 @@ router.post('/videos', async (req, res) => {
 
 router.get('/videos/search', async (req, res) => {
   const { question } = req.query as { question: string };
-  const useApi = req.header['x-use-api'] as
+  const useApi = req.headers['x-use-api'] as
     | 'google'
     | 'hf'
     | 'openai'
