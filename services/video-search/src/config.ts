@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-const {
+let {
   npm_package_name,
   npm_package_version,
   PORT,
@@ -33,6 +33,10 @@ const {
   OPENAI_SUMMARY_PREFIX,
   USE,
 } = process.env;
+
+if (typeof USE === 'string') {
+    USE = USE.toLowerCase();
+}
 
 const DEFAULT_VIDEO_INDEX_NAME = 'idx-videos';
 const DEFAULT_VIDEO_PREFIX = 'video:';
@@ -101,8 +105,9 @@ export default {
       OPENAI_SUMMARY_PREFIX ?? `openai-${DEFAULT_SUMMARY_PREFIX}`,
   },
   use: {
-    GOOGLE: USE === 'GOOGLE',
-    HF: USE === 'HF',
-    OPENAI: USE === 'OPENAI',
+    DEFAULT: USE ?? 'openai',
+    GOOGLE: USE === 'google',
+    HF: USE === 'hf',
+    OPENAI: USE === 'openai',
   },
 };

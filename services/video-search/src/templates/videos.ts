@@ -12,7 +12,6 @@ The transcript of the video will also be used as the basis for a question and an
 Provide some examples questions and answers that could be asked about the video. Make these questions very specific.
 
 Total output will be a summary of the video and a list of example questions the user could ask of the video.
-Total output must have a maximum length of 8192 tokens.
 
 SUMMARY AND QUESTIONS:
 `;
@@ -35,7 +34,6 @@ Provide some examples questions and answers that could be asked about the video.
 these questions very specific.
 If the context isn't useful, return the original summary and questions.
 Total output will be a summary of the video and a list of example questions the user could ask of the video.
-Total output must have a maximum length of 8192 tokens.
 
 SUMMARY AND QUESTIONS:
 `;

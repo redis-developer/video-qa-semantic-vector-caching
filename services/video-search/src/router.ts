@@ -10,30 +10,13 @@ function getApi(api?: 'google' | 'hf' | 'openai') {
   if (typeof api === 'string') {
     api = api.toLowerCase() as 'google' | 'hf' | 'openai';
   }
+  const defaultAPI = config.use.DEFAULT;
 
-  const useGoogle = api === 'google' || (!api && config.use.GOOGLE);
-  const useHf = api === 'hf' || (!api && config.use.HF);
-  const useOpenai = api === 'openai' || (!api && config.use.OPENAI);
-
-  if (useGoogle) {
-    return {
-      summarize: google.summarize,
-      store: google.store,
-      search: google.search,
-    };
-  } else if (useHf) {
-    return {
-      summarize: hf.summarize,
-      store: hf.store,
-      search: hf.search,
-    };
-  } else {
-    return {
-      summarize: openai.summarize,
-      store: openai.store,
-      search: openai.search,
-    };
-  }
+  return {
+    google,
+    hf,
+    openai,
+  }[api ?? defaultAPI] as typeof openai;
 }
 
 const defaultApi = getApi();
@@ -77,24 +60,23 @@ async function search({
 
 router.post('/videos', async (req, res) => {
   const { videos } = req.body as { videos: string[] };
-  const useApi = req.headers['x-use-api'] as
-    | 'google'
-    | 'hf'
-    | 'openai'
-    | undefined;
-  const api = getApi(useApi);
+  const apis: ['google', 'hf', 'openai'] = ['google', 'hf', 'openai'];
 
   try {
-    await loadVideos({ api, videos });
+    await Promise.all(
+      apis.map((api) => {
+        return loadVideos({ api: getApi(api), videos });
+      }),
+    );
 
     res.status(200).json({ message: 'Videos loaded' });
   } catch (e) {
-    log.error('Unexpected error in /videos/load', {
+    log.error('Unexpected error in /videos', {
       error: {
         message: (e as Error).message,
         stack: (e as Error).stack,
       },
-      location: 'router.videos.google.load',
+      location: 'router.videos',
     });
 
     res.status(500).json({ error: (e as Error).message });
