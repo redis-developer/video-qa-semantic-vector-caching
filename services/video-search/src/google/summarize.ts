@@ -28,7 +28,7 @@ const questionSummarizeChain = QUESTION_PROMPT.pipe(llm).pipe(
   new StringOutputParser(),
 );
 
-const cache = cacheAside(config.openai.SUMMARY_PREFIX);
+const cache = cacheAside(config.google.SUMMARY_PREFIX);
 
 export async function docs(allDocs: VideoDocument[][]) {
   const summarizedDocs: VideoDocument[] = [];
@@ -36,7 +36,7 @@ export async function docs(allDocs: VideoDocument[][]) {
   for (const docs of allDocs) {
     log.debug(`Summarizing ${docs[0].metadata.link}`, {
       ...docs[0].metadata,
-      location: 'openai.summarize.docs',
+      location: 'google.summarize.docs',
     });
     const existingSummary = await cache.get(docs[0].metadata.id);
 
@@ -56,7 +56,7 @@ export async function docs(allDocs: VideoDocument[][]) {
 
     log.debug(`Summarized ${docs[0].metadata.link}:\n ${summary}`, {
         summary,
-        location: 'openai.summarize.docs',
+        location: 'google.summarize.docs',
     });
     await cache.set(docs[0].metadata.id, summary);
 

@@ -10,7 +10,7 @@ export async function queryEmbeddings(text: string): Promise<number[]> {
   return embeddings.embedQuery(text);
 }
 
-const cache = cacheAside('summaries-hf:');
+const cache = cacheAside(config.hf.SUMMARY_PREFIX);
 
 async function summarizeText(text: string) {
   const generator = await pipeline('summarization', config.hf.SUMMARY_MODEL);
@@ -43,6 +43,10 @@ export async function docs(allDocs: VideoDocument[][]) {
 
     const summary = await summarizeText(docs[0].pageContent);
 
+    log.debug(`Summarized ${docs[0].metadata.link}:\n ${summary}`, {
+        summary,
+        location: 'hf.summarize.docs',
+    });
     await cache.set(docs[0].metadata.id, summary);
 
     summarizedDocs.push(

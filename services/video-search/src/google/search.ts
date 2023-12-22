@@ -8,7 +8,7 @@ async function getVideos(question: string) {
     `Performing similarity search for videos that answer: ${question}`,
     {
       question,
-      location: 'hf.search.search',
+      location: 'google.search.search',
     },
   );
 
@@ -21,22 +21,19 @@ async function getVideos(question: string) {
 
 export async function search(question: string) {
   log.debug(`Original question: ${question}`, {
-    location: 'hf.search.search',
+    location: 'google.search.search',
   });
   const semanticQuestion = await summarize.question(question);
 
   log.debug(`Semantic question: ${semanticQuestion}`, {
-    location: 'hf.search.search',
+    location: 'google.search.search',
   });
   let videos = await getVideos(semanticQuestion);
 
   if (videos.length === 0) {
-    log.debug(
-      'No videos found for semantic question, trying with original question',
-      {
-        location: 'hf.search.search',
-      },
-    );
+    log.debug('No videos found for semantic question, trying with original question', {
+      location: 'google.search.search',
+    });
 
     videos = await getVideos(question);
   }
