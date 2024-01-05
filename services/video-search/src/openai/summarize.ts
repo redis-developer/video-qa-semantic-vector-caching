@@ -55,8 +55,8 @@ export async function docs(allDocs: VideoDocument[][]) {
     const summary = await videoSummarizeChain.run(docsSummary);
 
     log.debug(`Summarized ${docs[0].metadata.link}:\n ${summary}`, {
-        summary,
-        location: 'openai.summarize.docs',
+      summary,
+      location: 'openai.summarize.docs',
     });
     await cache.set(docs[0].metadata.id, summary);
 

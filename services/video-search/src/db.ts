@@ -23,12 +23,12 @@ export function cacheAside(prefix: string) {
 }
 
 export function jsonCacheAside<T>(prefix: string) {
-    return {
-      get: async (key: string): Promise<T | undefined> => {
-        return client.json.get(`${prefix}${key}`) as T;
-      },
-      set: async (key: string, value: any) => {
-        return client.json.set(`${prefix}${key}`, '$', value);
-      },
-    };
+  return {
+    get: async (key: string): Promise<T | undefined> => {
+      return client.json.get(`${prefix}${key}`) as T;
+    },
+    set: async (key: string, value: any) => {
+      return client.json.set(`${prefix}${key}`, '$', value);
+    },
+  };
 }

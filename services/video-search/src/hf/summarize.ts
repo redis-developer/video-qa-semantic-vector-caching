@@ -2,7 +2,11 @@ import { Document } from 'langchain/document';
 import { embeddings } from './config.js';
 import { VideoDocument } from '../transcripts/load.js';
 import { cacheAside } from '../db.js';
-import { SummarizationOutput, SummarizationSingle, pipeline } from '@xenova/transformers';
+import {
+  SummarizationOutput,
+  SummarizationSingle,
+  pipeline,
+} from '@xenova/transformers';
 import config from '../config.js';
 import log from '../log.js';
 
@@ -48,8 +52,8 @@ export async function docs(allDocs: VideoDocument[][]) {
     const summary = await summarizeText(docs[0].pageContent);
 
     log.debug(`Summarized ${docs[0].metadata.link}:\n ${summary}`, {
-        summary,
-        location: 'hf.summarize.docs',
+      summary,
+      location: 'hf.summarize.docs',
     });
     await cache.set(docs[0].metadata.id, summary);
 

@@ -23,7 +23,7 @@ export async function search(question: string) {
   log.debug(`Original question: ${question}`, {
     location: 'google.search.search',
   });
-  const semanticQuestion = await summarize.question(question) as string;
+  const semanticQuestion = (await summarize.question(question)) as string;
 
   log.debug(`Semantic question: ${semanticQuestion}`, {
     location: 'google.search.search',
@@ -31,9 +31,12 @@ export async function search(question: string) {
   let videos = await getVideos(semanticQuestion);
 
   if (videos.length === 0) {
-    log.debug('No videos found for semantic question, trying with original question', {
-      location: 'google.search.search',
-    });
+    log.debug(
+      'No videos found for semantic question, trying with original question',
+      {
+        location: 'google.search.search',
+      },
+    );
 
     videos = await getVideos(question);
   }

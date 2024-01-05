@@ -1,7 +1,10 @@
 import config from '../config.js';
 import { client } from '../db.js';
 import { RedisVectorStore } from 'langchain/vectorstores/redis';
-import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
+import {
+  ChatGoogleGenerativeAI,
+  GoogleGenerativeAIEmbeddings,
+} from '@langchain/google-genai';
 import { TaskType } from '@google/generative-ai';
 
 export const llm = new ChatGoogleGenerativeAI({
@@ -14,7 +17,7 @@ export function getEmbeddings(modelName?: string) {
   return new GoogleGenerativeAIEmbeddings({
     apiKey: config.google.API_KEY,
     modelName: modelName ?? config.google.EMBEDDING_MODEL,
-    taskType: TaskType.SEMANTIC_SIMILARITY
+    taskType: TaskType.SEMANTIC_SIMILARITY,
   });
 }
 
