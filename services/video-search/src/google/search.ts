@@ -23,7 +23,7 @@ export async function search(question: string) {
   log.debug(`Original question: ${question}`, {
     location: 'google.search.search',
   });
-  const semanticQuestion = await summarize.question(question);
+  const semanticQuestion = await summarize.question(question) as string;
 
   log.debug(`Semantic question: ${semanticQuestion}`, {
     location: 'google.search.search',

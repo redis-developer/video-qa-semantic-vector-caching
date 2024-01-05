@@ -17,10 +17,7 @@ export default function QuestionForm({ onSubmit }: QuestionFormProps) {
         /* and other goodies */
       }) => (
         <Form>
-          <Field as="textarea" name="question" />
-          <button type="submit" disabled={isSubmitting}>
-            Submit
-          </button>
+          <Field as="input" name="question" className="w-full p-4 border rounded shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" />
         </Form>
       )}
     </Formik>

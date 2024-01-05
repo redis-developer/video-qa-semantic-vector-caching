@@ -18,14 +18,14 @@ const splitter = new TokenTextSplitter({
   chunkOverlap: 250,
 });
 
-const videoSummarizeChain = loadSummarizationChain(llm, {
+const videoSummarizeChain = loadSummarizationChain(llm as any, {
   type: 'refine',
   questionPrompt: SUMMARY_PROMPT,
   refinePrompt: SUMMARY_REFINE_PROMPT,
 });
 
-const questionSummarizeChain = QUESTION_PROMPT.pipe(llm).pipe(
-  new StringOutputParser(),
+const questionSummarizeChain = QUESTION_PROMPT.pipe(llm as any).pipe(
+  new StringOutputParser() as any,
 );
 
 const cache = cacheAside(config.openai.SUMMARY_PREFIX);

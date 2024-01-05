@@ -35,7 +35,7 @@ let {
 } = process.env;
 
 if (typeof USE === 'string') {
-    USE = USE.toLowerCase();
+  USE = USE.toLowerCase();
 }
 
 const DEFAULT_VIDEO_INDEX_NAME = 'idx-videos';
@@ -89,8 +89,7 @@ export default {
     EMBEDDING_MODEL: GOOGLE_EMBEDDING_MODEL ?? 'embedding-001',
     SUMMARY_MODEL: GOOGLE_SUMMARY_MODEL ?? 'gemini-pro',
     VECTOR_SET: GOOGLE_VECTOR_SET ?? `google-${DEFAULT_VECTOR_SET}`,
-    SUMMARY_PREFIX:
-      GOOGLE_SUMMARY_PREFIX ?? `google-${DEFAULT_SUMMARY_PREFIX}`,
+    SUMMARY_PREFIX: GOOGLE_SUMMARY_PREFIX ?? `google-${DEFAULT_SUMMARY_PREFIX}`,
   },
   openai: {
     VIDEO_INDEX_NAME:
@@ -101,8 +100,7 @@ export default {
     EMBEDDING_MODEL: OPENAI_EMBEDDING_MODEL ?? 'gpt-4',
     SUMMARY_MODEL: OPENAI_SUMMARY_MODEL ?? 'gpt-4',
     VECTOR_SET: OPENAI_VECTOR_SET ?? `openai-${DEFAULT_VECTOR_SET}`,
-    SUMMARY_PREFIX:
-      OPENAI_SUMMARY_PREFIX ?? `openai-${DEFAULT_SUMMARY_PREFIX}`,
+    SUMMARY_PREFIX: OPENAI_SUMMARY_PREFIX ?? `openai-${DEFAULT_SUMMARY_PREFIX}`,
   },
   use: {
     DEFAULT: USE ?? 'openai',

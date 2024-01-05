@@ -2,7 +2,7 @@ import { Document } from 'langchain/document';
 import { embeddings } from './config.js';
 import { VideoDocument } from '../transcripts/load.js';
 import { cacheAside } from '../db.js';
-import { pipeline } from '@xenova/transformers';
+import { SummarizationOutput, SummarizationSingle, pipeline } from '@xenova/transformers';
 import config from '../config.js';
 import log from '../log.js';
 
@@ -17,7 +17,11 @@ async function summarizeText(text: string) {
 
   const response = await generator(text);
 
-  return response?.[0]?.summary_text as string;
+  if (Array.isArray(response)) {
+    return (response as SummarizationOutput)[0].summary_text;
+  }
+
+  return (response as SummarizationSingle).summary_text;
 }
 
 export async function docs(allDocs: VideoDocument[][]) {
