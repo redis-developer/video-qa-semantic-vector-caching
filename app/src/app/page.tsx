@@ -19,7 +19,9 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="container mx-auto p-4">
-        <h1>Search for videos</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-center text-indigo-600 my-8">
+          Search for videos... semantically!
+        </h1>
         <QuestionForm onSubmit={handleSearch} />
         <VideoList videos={videos} />
       </div>
