@@ -54,19 +54,28 @@ async function getTranscript(video: string, info: VideoInfo) {
     apiKey: config.search.API_KEY,
   });
 
-  const docs: VideoDocument[] = (await loader.load()).map((doc) => {
-    doc.metadata = {
-      id: video,
-      link: `https://www.youtube.com/watch?v=${video}`,
-      ...info,
-    };
+  try {
+    const docs: VideoDocument[] = (await loader.load()).map((doc) => {
+      doc.metadata = {
+        id: video,
+        link: `https://www.youtube.com/watch?v=${video}`,
+        ...info,
+      };
 
-    return doc as VideoDocument;
-  });
+      return doc as VideoDocument;
+    });
 
-  await cache.set(video, docs[0].pageContent);
+    await cache.set(video, docs[0].pageContent);
 
-  return docs;
+    return docs;
+  } catch (e) {
+    log.error(`Error loading transcript for ${video}`, {
+      location: 'transcripts.load.getTranscript',
+      error: e,
+    });
+
+    return [];
+  }
 }
 
 async function getVideoInfo(videos: string[]) {
@@ -131,7 +140,9 @@ async function getVideoInfo(videos: string[]) {
 export async function load(videos: string[] = config.youtube.VIDEOS) {
   const videoInfo = await getVideoInfo(videos);
 
-  return mapAsyncInOrder(videos, (video) => {
+  const transcripts = await mapAsyncInOrder(videos, (video) => {
     return getTranscript(video, videoInfo[video]);
   });
+
+  return transcripts.filter((transcript) => transcript.length > 0);
 }

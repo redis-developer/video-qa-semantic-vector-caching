@@ -52,6 +52,9 @@ export default {
     }`,
     PORT: PORT ?? 3001,
   },
+  searches: {
+    KNN: 10,
+  },
   log: {
     LEVEL: LOG_LEVEL ?? 'info',
     STREAM: LOG_STREAM ?? 'LOGS',
