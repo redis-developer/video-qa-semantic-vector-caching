@@ -7,11 +7,11 @@ import log from '../log.js';
 import { youtube } from '@googleapis/youtube';
 
 export type VideoDocument = Document<{
-  id: string;
-  link: string;
-  title: string;
-  description: string;
-  thumbnail: string;
+  id: string
+  link: string
+  title: string
+  description: string
+  thumbnail: string
 }>;
 
 const youtubeApi = youtube({
@@ -20,9 +20,9 @@ const youtubeApi = youtube({
 });
 
 export interface VideoInfo {
-  title: string;
-  description: string;
-  thumbnail: string;
+  title: string
+  description: string
+  thumbnail: string
 }
 
 const cache = cacheAside('transcripts:');
@@ -35,7 +35,7 @@ async function getTranscript(video: string, info: VideoInfo) {
 
   const existingTranscript = await cache.get(video);
 
-  if (existingTranscript) {
+  if (typeof existingTranscript === 'string') {
     return [
       new Document({
         metadata: {
@@ -79,7 +79,7 @@ async function getTranscript(video: string, info: VideoInfo) {
 }
 
 async function getVideoInfo(videos: string[]) {
-  log.debug(`Getting info about videos: ${videos}`, {
+  log.debug(`Getting info about videos: ${JSON.stringify(videos)}`, {
     location: 'transcripts.load.getVideoInfo',
   });
 
@@ -90,7 +90,7 @@ async function getVideoInfo(videos: string[]) {
     videos.map(async (video) => {
       const cachedVideo = await videoCache.get(video);
 
-      if (!cachedVideo) {
+      if (typeof cachedVideo === 'undefined') {
         videosToLoad.push(video);
 
         return;
@@ -100,7 +100,7 @@ async function getVideoInfo(videos: string[]) {
     }),
   );
 
-  if (!videosToLoad.length) {
+  if (videosToLoad.length === 0) {
     return results;
   }
 
@@ -111,7 +111,7 @@ async function getVideoInfo(videos: string[]) {
 
   const { items } = response.data;
 
-  if (!items) {
+  if (!Array.isArray(items) || items.length === 0) {
     return results;
   }
 
@@ -119,14 +119,14 @@ async function getVideoInfo(videos: string[]) {
     items.map(async (item) => {
       const { id, snippet } = item;
 
-      if (!id || !snippet) {
+      if (typeof id !== 'string' || typeof snippet === 'undefined') {
         return;
       }
 
       const videoInfo = {
-        title: snippet.title as string,
-        description: snippet.description as string,
-        thumbnail: snippet.thumbnails?.maxres?.url as string,
+        title: snippet.title ?? '',
+        description: snippet.description ?? '',
+        thumbnail: snippet.thumbnails?.maxres?.url ?? '',
       };
 
       results[id] = videoInfo;
@@ -140,8 +140,8 @@ async function getVideoInfo(videos: string[]) {
 export async function load(videos: string[] = config.youtube.VIDEOS) {
   const videoInfo = await getVideoInfo(videos);
 
-  const transcripts = await mapAsyncInOrder(videos, (video) => {
-    return getTranscript(video, videoInfo[video]);
+  const transcripts = await mapAsyncInOrder(videos, async (video) => {
+    return await getTranscript(video, videoInfo[video]);
   });
 
   return transcripts.filter((transcript) => transcript.length > 0);

@@ -1,17 +1,17 @@
 import config from './config.js';
 import { client } from './db.js';
-import { LEVEL, MESSAGE, SPLAT } from 'triple-beam';
+import { LEVEL, type MESSAGE, SPLAT } from 'triple-beam';
 import winston from 'winston';
 import Transport from 'winston-transport';
 
 interface TransportInfo {
-  service: string;
-  location: string;
-  level: string;
-  message: string;
-  [LEVEL]: string;
-  [MESSAGE]: string;
-  [SPLAT]: [any];
+  service: string
+  location: string
+  level: string
+  message: string
+  [LEVEL]: string
+  [MESSAGE]: string
+  [SPLAT]: [any]
 }
 
 class RedisTransport extends Transport {
@@ -23,7 +23,7 @@ class RedisTransport extends Transport {
       const location = meta?.location ?? 'unknown';
 
       if (level.toLowerCase() === 'info') {
-        return callback();
+        callback(); return;
       }
 
       if (typeof message !== 'string') {

@@ -1,17 +1,17 @@
 import { Document } from 'langchain/document';
 import { embeddings } from './config.js';
-import { VideoDocument } from '../transcripts/load.js';
+import { type VideoDocument } from '../transcripts/load.js';
 import { cacheAside } from '../db.js';
 import {
-  SummarizationOutput,
-  SummarizationSingle,
+  type SummarizationOutput,
+  type SummarizationSingle,
   pipeline,
 } from '@xenova/transformers';
 import config from '../config.js';
 import log from '../log.js';
 
 export async function queryEmbeddings(text: string): Promise<number[]> {
-  return embeddings.embedQuery(text);
+  return await embeddings.embedQuery(text);
 }
 
 const cache = cacheAside(config.hf.SUMMARY_PREFIX);
@@ -38,7 +38,7 @@ export async function docs(allDocs: VideoDocument[][]) {
     });
     const existingSummary = await cache.get(docs[0].metadata.id);
 
-    if (existingSummary) {
+    if (typeof existingSummary === 'string') {
       summarizedDocs.push(
         new Document({
           metadata: docs[0].metadata,
@@ -69,5 +69,5 @@ export async function docs(allDocs: VideoDocument[][]) {
 }
 
 export async function question(question: string) {
-  return summarizeText(question);
+  return await summarizeText(question);
 }

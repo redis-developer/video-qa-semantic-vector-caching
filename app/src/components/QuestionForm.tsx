@@ -2,7 +2,7 @@ import { Formik, Form, Field } from 'formik';
 import CircularProgress from './CircularProgress';
 
 interface QuestionFormProps {
-  onSubmit: (question: string) => Promise<void> | void;
+  onSubmit: (question: string) => Promise<void> | void
 }
 
 export default function QuestionForm({ onSubmit }: QuestionFormProps) {
@@ -27,9 +27,11 @@ export default function QuestionForm({ onSubmit }: QuestionFormProps) {
             <button
               type="submit"
               className="absolute inset-y-0 right-0 px-4 text-white bg-indigo-600 rounded-r hover:bg-indigo-700 focus:outline-none focus:bg-indigo-700">
-              {isSubmitting ? (
+              {isSubmitting
+? (
                 <CircularProgress />
-              ) : (
+              )
+: (
                 <svg
                   className="w-6 h-6 fill-current"
                   xmlns="http://www.w3.org/2000/svg"

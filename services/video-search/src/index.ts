@@ -1,4 +1,4 @@
-//Note: Sample http proxy as api-gateway for demo purpose (only)
+// Note: Sample http proxy as api-gateway for demo purpose (only)
 import config from './config.js';
 import app from './app.js';
 import log from './log.js';

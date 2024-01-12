@@ -1,14 +1,14 @@
 import Image from 'next/image';
 
 export interface VideoDocument {
-  pageContent: string;
+  pageContent: string
   metadata: {
-    id: string;
-    link: string;
-    title: string;
-    description: string;
-    thumbnail: string;
-  };
+    id: string
+    link: string
+    title: string
+    description: string
+    thumbnail: string
+  }
 }
 
 const VideoList = ({ videos }: { videos: VideoDocument[] }) => {

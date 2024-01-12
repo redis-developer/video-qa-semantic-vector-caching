@@ -27,8 +27,8 @@ async function loadVideos({
   api,
   videos,
 }: {
-  api: typeof defaultApi;
-  videos: string[];
+  api: typeof defaultApi
+  videos: string[]
 }) {
   log.debug('Loading videos...', {
     location: 'router.videos.load',
@@ -44,8 +44,8 @@ async function search({
   api,
   question,
 }: {
-  api: typeof defaultApi;
-  question: string;
+  api: typeof defaultApi
+  question: string
 }) {
   const results = await api.search(question);
 
@@ -64,8 +64,8 @@ router.post('/videos', async (req, res) => {
 
   try {
     await Promise.all(
-      apis.map((api) => {
-        return loadVideos({ api: getApi(api), videos });
+      apis.map(async (api) => {
+        await loadVideos({ api: getApi(api), videos });
       }),
     );
 

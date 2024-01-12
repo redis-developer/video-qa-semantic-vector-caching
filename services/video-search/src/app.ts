@@ -23,13 +23,13 @@ app.use(
       return;
     }
 
-    let status: number = (<any>err).status;
+    let status: number = (err as any).status;
 
-    if (!status) {
-      status = (<any>err).statusCode;
+    if (typeof status === "undefined") {
+      status = (err as any).statusCode;
     }
 
-    if (!status) {
+    if (typeof status === "undefined") {
       status = 500;
     }
 

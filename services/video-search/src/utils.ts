@@ -1,5 +1,5 @@
 export async function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function mapAsyncInOrder<T, U>(
@@ -8,7 +8,7 @@ export async function mapAsyncInOrder<T, U>(
 ): Promise<U[]> {
   const results: any[] = [];
 
-  for (let item of array) {
+  for (const item of array) {
     results.push(await callback(item));
   }
 

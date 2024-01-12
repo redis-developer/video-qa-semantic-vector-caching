@@ -11,6 +11,7 @@
   "scripts": {
     "build": "npm run ts",
     "dev": "npm run build && run-p watch ts:watch",
+    "lint": "eslint --ext .ts src --fix",
     "serve": "nodemon dist/index.js",
     "start": "node dist/index.js",
     "ts": "tsc -p .",
@@ -43,7 +44,11 @@
     "@types/fs-extra": "^11.0.4",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.6",
-    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-standard-with-typescript": "^43.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
     "nodemon": "^3.0.2",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.3.3"

@@ -22,6 +22,11 @@ services:
     env_file:
       - ./app/.env
       - ./.env.app
+    volumes:
+      - ./app:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    restart: always
     depends_on:
       - redis
 
@@ -37,5 +42,9 @@ services:
     env_file:
       - ./services/video-search/.env
       - ./.env.video-search
+    volumes:
+      - ./services/video-search:/usr/src/app
+      - /service/node_modules
+    restart: always
     depends_on:
       - redis

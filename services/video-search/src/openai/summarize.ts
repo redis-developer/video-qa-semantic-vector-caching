@@ -1,6 +1,6 @@
 import { Document } from 'langchain/document';
 import { TokenTextSplitter } from 'langchain/text_splitter';
-import { VideoDocument } from '../transcripts/index.js';
+import { type VideoDocument } from '../transcripts/index.js';
 import {
   QUESTION_PROMPT,
   SUMMARY_PROMPT,
@@ -18,13 +18,16 @@ const splitter = new TokenTextSplitter({
   chunkOverlap: 250,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const videoSummarizeChain = loadSummarizationChain(llm as any, {
   type: 'refine',
   questionPrompt: SUMMARY_PROMPT,
   refinePrompt: SUMMARY_REFINE_PROMPT,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const questionSummarizeChain = QUESTION_PROMPT.pipe(llm as any).pipe(
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   new StringOutputParser() as any,
 );
 
@@ -40,7 +43,7 @@ export async function docs(allDocs: VideoDocument[][]) {
     });
     const existingSummary = await cache.get(docs[0].metadata.id);
 
-    if (existingSummary) {
+    if (typeof existingSummary === 'string') {
       summarizedDocs.push(
         new Document({
           metadata: docs[0].metadata,

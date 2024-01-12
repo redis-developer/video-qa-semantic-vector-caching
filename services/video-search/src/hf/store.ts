@@ -1,6 +1,6 @@
 import { client } from '../db.js';
 import { vectorStore } from './config.js';
-import { VideoDocument } from '../transcripts/load.js';
+import { type VideoDocument } from '../transcripts/load.js';
 import config from '../config.js';
 import log from '../log.js';
 

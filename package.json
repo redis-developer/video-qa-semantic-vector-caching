@@ -1,11 +1,16 @@
 {
   "name": "generative-qa-bot",
+  "workspaces": [
+    "services/*",
+    "app"
+  ],
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "npm run lint --workspaces"
   },
   "dependencies": {},
   "devDependencies": {
