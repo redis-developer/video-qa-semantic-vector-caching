@@ -5,7 +5,7 @@ const UPLOAD_API = `${VIDEO_SEARCH_SERVICE}/api/videos`;
 
 export async function POST(request: NextRequest) {
     const res: { videos: string[] } = await request.json();
-    const response = await fetch(`${UPLOAD_API}`, {
+    const response = await fetch(UPLOAD_API, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

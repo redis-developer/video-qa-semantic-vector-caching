@@ -44,7 +44,7 @@ services:
             - ./services/video-search/.env.docker
         volumes:
             - ./services/video-search:/usr/src/app
-            - /service/node_modules
+            - /usr/src/app/node_modules
         restart: always
         depends_on:
             - redis
