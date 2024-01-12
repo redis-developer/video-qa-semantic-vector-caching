@@ -25,8 +25,8 @@ export interface VideoInfo {
     thumbnail: string;
 }
 
-const cache = cacheAside('transcripts:');
-const videoCache = jsonCacheAside<VideoInfo>('yt-videos:');
+const cache = cacheAside(config.youtube.TRANSCRIPT_PREFIX);
+const videoCache = jsonCacheAside<VideoInfo>(config.youtube.VIDEO_INFO_PREFIX);
 
 async function getTranscript(video: string, info: VideoInfo) {
     log.debug(
@@ -93,7 +93,7 @@ async function getVideoInfo(videos: string[]) {
         videos.map(async (video) => {
             const cachedVideo = await videoCache.get(video);
 
-            if (typeof cachedVideo === 'undefined') {
+            if (typeof cachedVideo === 'undefined' || cachedVideo === null) {
                 videosToLoad.push(video);
 
                 return;

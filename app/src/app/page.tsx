@@ -6,9 +6,15 @@ import VideoList, { type VideoDocument } from '@/components/VideoList';
 import Modal from '@/components/Modal';
 import UploadButton from '@/components/UploadButton';
 import VideoForm from '@/components/VideoForm';
+import Markdown from '@/components/Markdown';
+
+interface VideoSearchResult {
+  videos: VideoDocument[];
+  answer: string;
+}
 
 export default function Home() {
-  const [videos, setVideos] = useState<VideoDocument[]>([]);
+  const [results, setResults] = useState<VideoSearchResult>();
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async (videos: string[]) => {
@@ -25,8 +31,8 @@ export default function Home() {
   const handleSearch = async (question: string) => {
     // Replace with your API call
     const response = await fetch(`/api/search?question=${question}`);
-    const data: { results: VideoDocument[] } = await response.json();
-    setVideos(data.results ?? []);
+    const data: VideoSearchResult = await response.json();
+    setResults(data);
   };
 
   return (
@@ -34,10 +40,16 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <div className="container mx-auto p-4">
           <h1 className="text-3xl md:text-4xl font-bold text-center text-indigo-600 my-8">
-            Search for videos... semantically!
+            Ask me about Redis
           </h1>
           <QuestionForm onSubmit={handleSearch} />
-          <VideoList videos={videos} />
+          {typeof results !== 'undefined' && (
+            <div className="py-4">
+              <Markdown markdown={results?.answer ?? ''} />
+              <h2>To learn more, check out these videos:</h2>
+              <VideoList videos={results?.videos ?? []} />
+            </div>
+          )}
         </div>
       </main>
 

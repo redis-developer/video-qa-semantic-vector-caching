@@ -19,6 +19,7 @@ let {
     GOOGLE_SUMMARY_MODEL,
     GOOGLE_VECTOR_SET,
     GOOGLE_SUMMARY_PREFIX,
+    GOOGLE_ANSWER_PREFIX,
     OPENAI_VIDEO_INDEX_NAME,
     OPENAI_VIDEO_PREFIX,
     OPENAI_API_KEY,
@@ -27,6 +28,7 @@ let {
     OPENAI_SUMMARY_MODEL,
     OPENAI_VECTOR_SET,
     OPENAI_SUMMARY_PREFIX,
+    OPENAI_ANSWER_PREFIX,
     USE,
 } = process.env;
 
@@ -38,6 +40,7 @@ const DEFAULT_VIDEO_INDEX_NAME = 'idx-videos';
 const DEFAULT_VIDEO_PREFIX = 'video:';
 const DEFAULT_VECTOR_SET = 'video-vectors';
 const DEFAULT_SUMMARY_PREFIX = 'video-summary:';
+const DEFAULT_ANSWER_PREFIX = 'video-answer:';
 
 export default {
     app: {
@@ -65,6 +68,8 @@ export default {
             YOUTUBE_VIDEOS ??
             'AJhTduDOVCs,c9Rr--1r6pk,FQzlq91g7mg,I-ohlZXXaxs,KUfufrwpBkM,LaiQFZ5bXaM,SzcpwtLRgyk,Z8qcpXyMAiA'
         ).split(','),
+        TRANSCRIPT_PREFIX: 'transcripts:',
+        VIDEO_INFO_PREFIX: 'yt-videos:',
     },
     redis: {
         REDIS_URL: REDIS_URL ?? 'redis://localhost:6379',
@@ -82,6 +87,8 @@ export default {
         VECTOR_SET: GOOGLE_VECTOR_SET ?? `google-${DEFAULT_VECTOR_SET}`,
         SUMMARY_PREFIX:
             GOOGLE_SUMMARY_PREFIX ?? `google-${DEFAULT_SUMMARY_PREFIX}`,
+        ANSWER_PREFIX:
+            GOOGLE_ANSWER_PREFIX ?? `google-${DEFAULT_ANSWER_PREFIX}`,
     },
     openai: {
         VIDEO_INDEX_NAME:
@@ -94,6 +101,8 @@ export default {
         VECTOR_SET: OPENAI_VECTOR_SET ?? `openai-${DEFAULT_VECTOR_SET}`,
         SUMMARY_PREFIX:
             OPENAI_SUMMARY_PREFIX ?? `openai-${DEFAULT_SUMMARY_PREFIX}`,
+        ANSWER_PREFIX:
+            OPENAI_ANSWER_PREFIX ?? `openai-${DEFAULT_ANSWER_PREFIX}`,
     },
     use: {
         DEFAULT: USE ?? 'openai',

@@ -90,7 +90,7 @@ router.get('/videos/search', async (req, res) => {
     try {
         const results = await search({ api, question });
 
-        res.status(200).json({ results });
+        res.status(200).json({ ...results });
     } catch (e) {
         log.error('Unexpected error in /videos/search', {
             error: {
