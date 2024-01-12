@@ -7,11 +7,11 @@ import log from '../log.js';
 import { youtube } from '@googleapis/youtube';
 
 export type VideoDocument = Document<{
-    id: string
-    link: string
-    title: string
-    description: string
-    thumbnail: string
+    id: string;
+    link: string;
+    title: string;
+    description: string;
+    thumbnail: string;
 }>;
 
 const youtubeApi = youtube({
@@ -20,9 +20,9 @@ const youtubeApi = youtube({
 });
 
 export interface VideoInfo {
-    title: string
-    description: string
-    thumbnail: string
+    title: string;
+    description: string;
+    thumbnail: string;
 }
 
 const cache = cacheAside('transcripts:');
@@ -140,10 +140,25 @@ async function getVideoInfo(videos: string[]) {
     return results;
 }
 
-export async function load(videos: string[] = config.youtube.VIDEOS) {
-    const videoInfo = await getVideoInfo(videos);
+function parseVideoUrl(url: string) {
+    const regExp = /^.*(youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/;
+    const match = url.match(regExp);
 
-    const transcripts = await mapAsyncInOrder(videos, async (video) => {
+    if (typeof match !== 'undefined' && match !== null && match[2].length > 0) {
+        return match[2];
+    } else if (url.length === 11) {
+        // assume the url was an ID
+        return url;
+    }
+}
+
+export async function load(videos: string[] = config.youtube.VIDEOS) {
+    const videosToLoad: string[] = videos.map(parseVideoUrl).filter((video) => {
+        return typeof video === 'string';
+    }) as string[];
+    const videoInfo = await getVideoInfo(videosToLoad);
+
+    const transcripts = await mapAsyncInOrder(videosToLoad, async (video) => {
         return await getTranscript(video, videoInfo[video]);
     });
 

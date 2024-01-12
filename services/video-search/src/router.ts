@@ -26,8 +26,8 @@ async function loadVideos({
     api,
     videos,
 }: {
-    api: typeof defaultApi
-    videos: string[]
+    api: typeof defaultApi;
+    videos: string[];
 }) {
     log.debug('Loading videos...', {
         location: 'router.videos.load',
@@ -43,8 +43,8 @@ async function search({
     api,
     question,
 }: {
-    api: typeof defaultApi
-    question: string
+    api: typeof defaultApi;
+    question: string;
 }) {
     const results = await api.search(question);
 

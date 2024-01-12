@@ -5,13 +5,13 @@ import winston from 'winston';
 import Transport from 'winston-transport';
 
 interface TransportInfo {
-    service: string
-    location: string
-    level: string
-    message: string
-    [LEVEL]: string
-    [MESSAGE]: string
-    [SPLAT]: [any]
+    service: string;
+    location: string;
+    level: string;
+    message: string;
+    [LEVEL]: string;
+    [MESSAGE]: string;
+    [SPLAT]: [any];
 }
 
 class RedisTransport extends Transport {

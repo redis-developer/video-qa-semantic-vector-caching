@@ -2,7 +2,7 @@ import { Formik, Form, Field } from 'formik';
 import CircularProgress from './CircularProgress';
 
 interface QuestionFormProps {
-  onSubmit: (question: string) => Promise<void> | void
+  onSubmit: (question: string) => Promise<void> | void;
 }
 
 export default function QuestionForm({ onSubmit }: QuestionFormProps) {
