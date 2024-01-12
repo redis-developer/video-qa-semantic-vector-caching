@@ -10,38 +10,38 @@ app.use(express.json());
 app.use(morgan(config.env.DEV ? 'dev' : 'combined'));
 app.use('/api', router);
 app.use((req: express.Request, res: express.Response) => {
-  res.sendStatus(404);
+    res.sendStatus(404);
 });
 app.use(
-  (
-    err: Error,
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    if (res.headersSent) {
-      return;
-    }
+    (
+        err: Error,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+    ) => {
+        if (res.headersSent) {
+            return;
+        }
 
-    let status: number = (err as any).status;
+        let status: number = (err as any).status;
 
-    if (typeof status === "undefined") {
-      status = (err as any).statusCode;
-    }
+        if (typeof status === 'undefined') {
+            status = (err as any).statusCode;
+        }
 
-    if (typeof status === "undefined") {
-      status = 500;
-    }
+        if (typeof status === 'undefined') {
+            status = 500;
+        }
 
-    res.status(status);
+        res.status(status);
 
-    res.json({
-      error: {
-        message: err.message,
-        stack: config.env.DEV ? err.stack : undefined,
-      },
-    });
-  },
+        res.json({
+            error: {
+                message: err.message,
+                stack: config.env.DEV ? err.stack : undefined,
+            },
+        });
+    },
 );
 
 export default app;

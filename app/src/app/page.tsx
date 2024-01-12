@@ -4,16 +4,14 @@ import { useState } from 'react';
 import QuestionForm from '@/components/QuestionForm';
 import VideoList, { type VideoDocument } from '@/components/VideoList';
 
-const SEARCH_API = `http://localhost:3001/api/videos/search`;
-
 export default function Home() {
   const [videos, setVideos] = useState<VideoDocument[]>([]);
 
   const handleSearch = async (question: string) => {
     // Replace with your API call
-    const response = await fetch(`${SEARCH_API}?question=${question}`);
+    const response = await fetch(`/api/search?question=${question}`);
     const data: { results: VideoDocument[] } = await response.json();
-    setVideos(data.results);
+    setVideos(data.results ?? []);
   };
 
   return (

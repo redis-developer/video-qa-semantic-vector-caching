@@ -1,0 +1,16 @@
+**/node_modules
+**/.next
+**/compiled
+**/dist
+**/build
+**/.env
+**/.env*
+**/docker
+**/docs
+**/.git
+**/.DS_Store
+**/.eslintrc.json
+**/.gitignore
+**/.github
+**/.dockerignore
+**/readme.md

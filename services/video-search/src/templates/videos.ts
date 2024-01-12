@@ -39,5 +39,5 @@ SUMMARY AND QUESTIONS:
 `;
 
 export const SUMMARY_REFINE_PROMPT = PromptTemplate.fromTemplate(
-  summaryRefineTemplate,
+    summaryRefineTemplate,
 );

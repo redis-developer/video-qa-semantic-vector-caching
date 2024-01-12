@@ -9,23 +9,14 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "ignorePatterns": [
-        "scripts/**",
-        "build/**"
-    ],
+    "ignorePatterns": ["scripts/**", "build/**"],
     "rules": {
         "@typescript-eslint/indent": "off",
         "@typescript-eslint/quotes": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/semi": [
-            "error",
-            "always"
-        ],
+        "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/space-before-function-paren": "off",
-        "@typescript-eslint/comma-dangle": [
-            "error",
-            "always-multiline"
-        ]
+        "@typescript-eslint/comma-dangle": ["error", "always-multiline"]
     }
 }

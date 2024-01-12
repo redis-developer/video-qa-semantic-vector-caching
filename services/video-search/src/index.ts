@@ -6,7 +6,7 @@ import log from './log.js';
 app.set('port', config.app.PORT);
 
 app.listen(config.app.PORT, async () => {
-  log.info(`Server is running at http://localhost:${app.get('port')}`, {
-    location: 'index',
-  });
+    log.info(`Server is running at http://localhost:${app.get('port')}`, {
+        location: 'index',
+    });
 });

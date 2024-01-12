@@ -5,42 +5,42 @@ import log from '../log.js';
 import config from '../config.js';
 
 async function getVideos(question: string) {
-  log.debug(
-    `Performing similarity search for videos that answer: ${question}`,
-    {
-      question,
-      location: 'openai.search.search',
-    },
-  );
+    log.debug(
+        `Performing similarity search for videos that answer: ${question}`,
+        {
+            question,
+            location: 'openai.search.search',
+        },
+    );
 
-  const KNN = config.searches.KNN;
-  /* Simple standalone search in the vector DB */
-  return await (vectorStore.similaritySearch(question, KNN) as Promise<
-    VideoDocument[]
-  >);
+    const KNN = config.searches.KNN;
+    /* Simple standalone search in the vector DB */
+    return await (vectorStore.similaritySearch(question, KNN) as Promise<
+        VideoDocument[]
+    >);
 }
 
 export async function search(question: string) {
-  log.debug(`Original question: ${question}`, {
-    location: 'openai.search.search',
-  });
-  const semanticQuestion = (await summarize.question(question)) as string;
-
-  log.debug(`Semantic question: ${semanticQuestion}`, {
-    location: 'openai.search.search',
-  });
-  let videos = await getVideos(semanticQuestion);
-
-  if (videos.length === 0) {
-    log.debug(
-      'No videos found for semantic question, trying with original question',
-      {
+    log.debug(`Original question: ${question}`, {
         location: 'openai.search.search',
-      },
-    );
+    });
+    const semanticQuestion = (await summarize.question(question)) as string;
 
-    videos = await getVideos(question);
-  }
+    log.debug(`Semantic question: ${semanticQuestion}`, {
+        location: 'openai.search.search',
+    });
+    let videos = await getVideos(semanticQuestion);
 
-  return videos;
+    if (videos.length === 0) {
+        log.debug(
+            'No videos found for semantic question, trying with original question',
+            {
+                location: 'openai.search.search',
+            },
+        );
+
+        videos = await getVideos(question);
+    }
+
+    return videos;
 }

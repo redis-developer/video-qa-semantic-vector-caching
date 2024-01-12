@@ -1,50 +1,50 @@
 version: '3.9'
 services:
-  redis:
-    container_name: redis
-    image: 'redis/redis-stack:latest'
-    ports:
-      - 6379:6379
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+    redis:
+        container_name: redis
+        image: 'redis/redis-stack:latest'
+        ports:
+            - 6379:6379
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
 
-  app:
-    container_name: app
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-      args:
-        CWD: app
-    ports:
-      - '${APP_PORT}:${APP_PORT}'
-    env_file:
-      - ./app/.env
-      - ./.env.app
-    volumes:
-      - ./app:/usr/src/app
-      - /usr/src/app/node_modules
-      - /usr/src/app/.next
-    restart: always
-    depends_on:
-      - redis
+    app:
+        container_name: app
+        build:
+            context: ./
+            dockerfile: ./app/Dockerfile
+            target: dev
+        command: npm run dev
+        ports:
+            - '80:80'
+        env_file:
+            - ./app/.env
+            - ./app/.env.docker
+        volumes:
+            - ./app:/usr/src/app
+            - /usr/src/app/node_modules
+            - /usr/src/app/.next
+        restart: always
+        depends_on:
+            - redis
 
-  video-search-service:
-    container_name: video-search-service
-    build:
-      context: ./services/video-search
-      dockerfile: Dockerfile
-      args:
-        CWD: services/video-search
-    ports:
-      - '${VS_SVC_PORT}:${VS_SVC_PORT}'
-    env_file:
-      - ./services/video-search/.env
-      - ./.env.video-search
-    volumes:
-      - ./services/video-search:/usr/src/app
-      - /service/node_modules
-    restart: always
-    depends_on:
-      - redis
+    video-search-service:
+        container_name: video-search-service
+        build:
+            context: ./
+            dockerfile: ./services/video-search/Dockerfile
+            target: dev
+        command: npm run dev
+        ports:
+            - '8000:8000'
+        env_file:
+            - ./services/video-search/.env
+            - ./services/video-search/.env.docker
+        volumes:
+            - ./services/video-search:/usr/src/app
+            - /service/node_modules
+        restart: always
+        depends_on:
+            - redis

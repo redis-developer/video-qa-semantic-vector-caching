@@ -2,9 +2,9 @@ import { Document } from 'langchain/document';
 import { TokenTextSplitter } from 'langchain/text_splitter';
 import { type VideoDocument } from '../transcripts/index.js';
 import {
-  QUESTION_PROMPT,
-  SUMMARY_PROMPT,
-  SUMMARY_REFINE_PROMPT,
+    QUESTION_PROMPT,
+    SUMMARY_PROMPT,
+    SUMMARY_REFINE_PROMPT,
 } from '../templates/index.js';
 import { loadSummarizationChain } from 'langchain/chains';
 import { llm } from './config.js';
@@ -14,70 +14,70 @@ import log from '../log.js';
 import config from '../config.js';
 
 const splitter = new TokenTextSplitter({
-  chunkSize: 10000,
-  chunkOverlap: 250,
+    chunkSize: 10000,
+    chunkOverlap: 250,
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const videoSummarizeChain = loadSummarizationChain(llm as any, {
-  type: 'refine',
-  questionPrompt: SUMMARY_PROMPT,
-  refinePrompt: SUMMARY_REFINE_PROMPT,
+    type: 'refine',
+    questionPrompt: SUMMARY_PROMPT,
+    refinePrompt: SUMMARY_REFINE_PROMPT,
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const questionSummarizeChain = QUESTION_PROMPT.pipe(llm as any).pipe(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  new StringOutputParser() as any,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    new StringOutputParser() as any,
 );
 
 const cache = cacheAside(config.openai.SUMMARY_PREFIX);
 
 export async function docs(allDocs: VideoDocument[][]) {
-  const summarizedDocs: VideoDocument[] = [];
+    const summarizedDocs: VideoDocument[] = [];
 
-  for (const docs of allDocs) {
-    log.debug(`Summarizing ${docs[0].metadata.link}`, {
-      ...docs[0].metadata,
-      location: 'openai.summarize.docs',
-    });
-    const existingSummary = await cache.get(docs[0].metadata.id);
+    for (const docs of allDocs) {
+        log.debug(`Summarizing ${docs[0].metadata.link}`, {
+            ...docs[0].metadata,
+            location: 'openai.summarize.docs',
+        });
+        const existingSummary = await cache.get(docs[0].metadata.id);
 
-    if (typeof existingSummary === 'string') {
-      summarizedDocs.push(
-        new Document({
-          metadata: docs[0].metadata,
-          pageContent: existingSummary,
-        }),
-      );
+        if (typeof existingSummary === 'string') {
+            summarizedDocs.push(
+                new Document({
+                    metadata: docs[0].metadata,
+                    pageContent: existingSummary,
+                }),
+            );
 
-      continue;
+            continue;
+        }
+
+        const docsSummary = await splitter.splitDocuments(docs);
+        const summary = await videoSummarizeChain.run(docsSummary);
+
+        log.debug(`Summarized ${docs[0].metadata.link}:\n ${summary}`, {
+            summary,
+            location: 'openai.summarize.docs',
+        });
+        await cache.set(docs[0].metadata.id, summary);
+
+        summarizedDocs.push(
+            new Document({
+                metadata: docs[0].metadata,
+                pageContent: summary,
+            }),
+        );
     }
 
-    const docsSummary = await splitter.splitDocuments(docs);
-    const summary = await videoSummarizeChain.run(docsSummary);
-
-    log.debug(`Summarized ${docs[0].metadata.link}:\n ${summary}`, {
-      summary,
-      location: 'openai.summarize.docs',
-    });
-    await cache.set(docs[0].metadata.id, summary);
-
-    summarizedDocs.push(
-      new Document({
-        metadata: docs[0].metadata,
-        pageContent: summary,
-      }),
-    );
-  }
-
-  return summarizedDocs;
+    return summarizedDocs;
 }
 
 export async function question(question: string) {
-  const summary = await questionSummarizeChain.invoke({
-    question,
-  });
+    const summary = await questionSummarizeChain.invoke({
+        question,
+    });
 
-  return summary;
+    return summary;
 }
