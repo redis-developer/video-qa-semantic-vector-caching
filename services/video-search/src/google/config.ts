@@ -6,6 +6,7 @@ import {
     GoogleGenerativeAIEmbeddings,
 } from '@langchain/google-genai';
 import { TaskType } from '@google/generative-ai';
+import { VectorAlgorithms } from 'redis';
 
 export const llm = new ChatGoogleGenerativeAI({
     apiKey: config.google.API_KEY,
@@ -25,4 +26,18 @@ export const vectorStore = new RedisVectorStore(getEmbeddings(), {
     redisClient: client,
     indexName: config.google.VIDEO_INDEX_NAME,
     keyPrefix: config.google.VIDEO_PREFIX,
+    indexOptions: {
+        ALGORITHM: VectorAlgorithms.HNSW,
+        DISTANCE_METRIC: 'COSINE',
+    },
+});
+
+export const answerVectorStore = new RedisVectorStore(getEmbeddings(), {
+    redisClient: client,
+    indexName: config.google.ANSWER_INDEX_NAME,
+    keyPrefix: config.google.ANSWER_PREFIX,
+    indexOptions: {
+        ALGORITHM: VectorAlgorithms.HNSW,
+        DISTANCE_METRIC: 'L2',
+    },
 });

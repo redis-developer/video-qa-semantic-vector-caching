@@ -27,3 +27,9 @@ export const vectorStore = new RedisVectorStore(getEmbeddings(), {
     indexName: config.openai.VIDEO_INDEX_NAME,
     keyPrefix: config.openai.VIDEO_PREFIX,
 });
+
+export const answerVectorStore = new RedisVectorStore(getEmbeddings(), {
+    redisClient: client,
+    indexName: config.openai.ANSWER_INDEX_NAME,
+    keyPrefix: config.openai.ANSWER_PREFIX,
+});
