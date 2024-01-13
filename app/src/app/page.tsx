@@ -30,6 +30,7 @@ export default function Home() {
 
   const handleSearch = async (question: string) => {
     // Replace with your API call
+    setResults(undefined);
     const response = await fetch(`/api/search?question=${question}`);
     const data: VideoSearchResult = await response.json();
     setResults(data);

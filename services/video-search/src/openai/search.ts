@@ -34,30 +34,6 @@ async function getAnswer(question: string, videos: VideoDocument[]) {
         location: 'openai.search.getAnswer',
     });
 
-    const haveAnswers = await answerVectorStore.checkIndexExists();
-
-    if (haveAnswers) {
-        log.debug(`Searching for closest answer to question: ${question}`, {
-            location: 'google.search.getAnswer',
-            question,
-        });
-
-        const [result] = await answerVectorStore.similaritySearchWithScore(
-            question,
-            1,
-        );
-
-        log.debug(`Found closest answer with score: ${String(result[1])}`, {
-            location: 'google.search.getAnswer',
-            answer: result[0],
-            score: result[1],
-        });
-        
-        if (Array.isArray(result) && result.length > 0) {
-            return result[0];
-        }
-    }
-
     const answer = (await questionAnswerChain.invoke({
         question,
         data: JSON.stringify(videos),
@@ -81,6 +57,35 @@ export async function search(question: string) {
         location: 'openai.search.search',
     });
     const semanticQuestion = (await summarize.question(question)) as string;
+
+    const haveAnswers = await answerVectorStore.checkIndexExists();
+
+    if (haveAnswers) {
+        log.debug(`Searching for closest answer to question: ${question}`, {
+            location: 'openai.search.getAnswer',
+            question,
+        });
+
+        const [result] = await answerVectorStore.similaritySearchWithScore(
+            question,
+            1,
+        );
+
+        log.debug(`Found closest answer with score: ${String(result[1])}`, {
+            location: 'openai.search.getAnswer',
+            answer: result[0],
+            score: result[1],
+        });
+
+        if (Array.isArray(result) && result.length > 0) {
+            log.debug(`Found answer: ${result[0].metadata.answer}`, {
+                location: 'openai.search.getAnswer',
+                result: result[0].metadata,
+            });
+
+            return result[0].metadata;
+        }
+    }
 
     log.debug(`Semantic question: ${semanticQuestion}`, {
         location: 'openai.search.search',

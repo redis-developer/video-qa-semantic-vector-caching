@@ -34,6 +34,20 @@ async function getAnswer(question: string, videos: VideoDocument[]) {
         location: 'google.search.getAnswer',
     });
 
+    const answer = (await questionAnswerChain.invoke({
+        question,
+        data: JSON.stringify(videos),
+    })) as string;
+
+    return answer;
+}
+
+export async function search(question: string) {
+    log.debug(`Original question: ${question}`, {
+        location: 'google.search.search',
+    });
+    const semanticQuestion = (await summarize.question(question)) as string;
+
     const haveAnswers = await answerVectorStore.checkIndexExists();
 
     if (haveAnswers) {
@@ -52,35 +66,16 @@ async function getAnswer(question: string, videos: VideoDocument[]) {
             answer: result[0],
             score: result[1],
         });
-        
+
         if (Array.isArray(result) && result.length > 0) {
-            return result[0];
+            log.debug(`Found answer: ${result[0].metadata.answer}`, {
+                location: 'google.search.getAnswer',
+                result: result[0].metadata,
+            });
+
+            return result[0].metadata;
         }
     }
-
-    const answer = (await questionAnswerChain.invoke({
-        question,
-        data: JSON.stringify(videos),
-    })) as string;
-
-    await answerVectorStore.addDocuments([
-        new Document({
-            metadata: {
-                videos,
-                answer,
-            },
-            pageContent: question,
-        }),
-    ]);
-
-    return answer;
-}
-
-export async function search(question: string) {
-    log.debug(`Original question: ${question}`, {
-        location: 'google.search.search',
-    });
-    const semanticQuestion = (await summarize.question(question)) as string;
 
     log.debug(`Semantic question: ${semanticQuestion}`, {
         location: 'google.search.search',
@@ -102,8 +97,20 @@ export async function search(question: string) {
         location: 'openai.search.search',
     });
 
+    const answer = getAnswer(semanticQuestion, videos);
+
+    await answerVectorStore.addDocuments([
+        new Document({
+            metadata: {
+                videos,
+                answer,
+            },
+            pageContent: question,
+        }),
+    ]);
+
     return {
         videos,
-        answer: await getAnswer(semanticQuestion, videos),
+        answer,
     };
 }
