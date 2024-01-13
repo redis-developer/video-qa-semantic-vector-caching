@@ -3,6 +3,7 @@ import config from '../config.js';
 import { client } from '../db.js';
 import { RedisVectorStore } from 'langchain/vectorstores/redis';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { VectorAlgorithms } from 'redis';
 
 export const llm = new ChatOpenAI({
     openAIApiKey: config.openai.API_KEY,
@@ -26,10 +27,18 @@ export const vectorStore = new RedisVectorStore(getEmbeddings(), {
     redisClient: client,
     indexName: config.openai.VIDEO_INDEX_NAME,
     keyPrefix: config.openai.VIDEO_PREFIX,
+    indexOptions: {
+        ALGORITHM: VectorAlgorithms.HNSW,
+        DISTANCE_METRIC: 'COSINE',
+    },
 });
 
 export const answerVectorStore = new RedisVectorStore(getEmbeddings(), {
     redisClient: client,
     indexName: config.openai.ANSWER_INDEX_NAME,
     keyPrefix: config.openai.ANSWER_PREFIX,
+    indexOptions: {
+        ALGORITHM: VectorAlgorithms.HNSW,
+        DISTANCE_METRIC: 'L2',
+    },
 });

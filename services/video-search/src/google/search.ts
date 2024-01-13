@@ -52,6 +52,10 @@ async function getAnswer(question: string, videos: VideoDocument[]) {
             answer: result[0],
             score: result[1],
         });
+        
+        if (Array.isArray(result) && result.length > 0) {
+            return result[0];
+        }
     }
 
     const answer = (await questionAnswerChain.invoke({

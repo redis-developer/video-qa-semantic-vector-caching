@@ -1,11 +1,11 @@
+import { Document } from 'langchain/document';
 import * as summarize from './summarize.js';
 import { type VideoDocument } from '../transcripts/index.js';
-import { llm, vectorStore } from './config.js';
+import { llm, vectorStore, answerVectorStore } from './config.js';
 import log from '../log.js';
 import config from '../config.js';
 import { ANSWER_PROMPT } from '../templates/answers.js';
 import { StringOutputParser } from 'langchain/schema/output_parser';
-import { cacheAside } from '../db.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const questionAnswerChain = ANSWER_PROMPT.pipe(llm as any).pipe(
@@ -29,21 +29,33 @@ async function getVideos(question: string) {
     >);
 }
 
-const answerCache = cacheAside(config.openai.ANSWER_PREFIX);
-
 async function getAnswer(question: string, videos: VideoDocument[]) {
     log.debug(`Getting answer for question: ${question}`, {
         location: 'openai.search.getAnswer',
     });
 
-    const cachedAnswer = await answerCache.get(question);
+    const haveAnswers = await answerVectorStore.checkIndexExists();
 
-    if (typeof cachedAnswer === 'string') {
-        log.debug(`Found cached answer for question: ${question}`, {
-            location: 'openai.search.getAnswer',
+    if (haveAnswers) {
+        log.debug(`Searching for closest answer to question: ${question}`, {
+            location: 'google.search.getAnswer',
+            question,
         });
 
-        return cachedAnswer;
+        const [result] = await answerVectorStore.similaritySearchWithScore(
+            question,
+            1,
+        );
+
+        log.debug(`Found closest answer with score: ${String(result[1])}`, {
+            location: 'google.search.getAnswer',
+            answer: result[0],
+            score: result[1],
+        });
+        
+        if (Array.isArray(result) && result.length > 0) {
+            return result[0];
+        }
     }
 
     const answer = (await questionAnswerChain.invoke({
@@ -51,7 +63,15 @@ async function getAnswer(question: string, videos: VideoDocument[]) {
         data: JSON.stringify(videos),
     })) as string;
 
-    await answerCache.set(question, answer);
+    await answerVectorStore.addDocuments([
+        new Document({
+            metadata: {
+                videos,
+                answer,
+            },
+            pageContent: question,
+        }),
+    ]);
 
     return answer;
 }
