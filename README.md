@@ -35,7 +35,7 @@ npm run dev
 
 The containers are mounted to your local project director, so changes to the project will hot-reload.
 
-### Functionality breakdown
+## Functionality breakdown
 
 The process for how this app functions is as follows:
 
@@ -47,7 +47,7 @@ The process for how this app functions is as follows:
 }
 ```
 
-1. Both `Google` and `OpenAI` will be used to generate summaries and embeddings for the videos. You can edit `services/video-search/src/router.ts` if you don't want to use one or the other. You can also edit the `USE` environment variable for searches. `GOOGLE` uses Google and `OPENAI` uses OpenAI.
+1. Both `Google` and `OpenAI` will be used to generate summaries and embeddings for the videos. You can edit `services/video-search/src/router.ts` if you don't want to use one or the other. You can also edit the `USE` environment variable for searches. `GOOGLE` uses Google and `OPENAI` uses OpenAI (case-insensitive).
 1. A user goes to `http://localhost` and asks a question
 1. The question is simplified by asking Google/OpenAI for a semantically similar, shorter version.
 1. The semantic question is then used to search for videos that answer the question
@@ -63,9 +63,11 @@ There are two workspaces in this project: `app` and `services/video-search`. `vi
 
 Within the `video-search` service you will find a typical Express.js app. The bulk of the AI logic happens in the following directories:
 
-1. `src/google` - Contains all of the LLM setup, vector store setup, searching, and embedding logic and uses Google as the LLM
-1. `src/openai` - Contains all of the LLM setup, vector store setup, searching, and embedding logic and uses OpenAI as the LLM **NOTE**: **NOTE:** The above directories export the exact same interface to make it easy to swap them in and out.
-1. `src/templates` - Stores the LLM prompts for getting semantic questions, video summaries, and answers
+1. `src/api/llms` - Contains all of the LLM setup (llm and embeddings generator) for Google and OpenAI
+1. `src/api/templates` - Stores the LLM prompts for getting semantic questions, video summaries, and answers
+1. `src/api/prompt` - Contains the logic for using the LLM prompt templates to call the LLMs and get responses
+1. `src/api/search` - Contains the logic for performing the QA video search
+1. `src/api/store` - Handles storing vectors in Redis
 1. `src/transcripts` - Contains the logic to retrieve YouTube video information (title, description, thmubnail, and transcript)
 
 Almost all of the remaining important logic is found in `src/router.ts` where you will find the three API routes:
@@ -73,3 +75,7 @@ Almost all of the remaining important logic is found in `src/router.ts` where yo
 1. `POST /api/videos` - Accepts a list of `{ "videos": [] }` which can be either full YouTube URLs or the video IDs.
 1. `GET /api/videos/search` - Accepts a `?question=<question>` and returns a list of videos and the answer to the question
 1. `GET /api/healthcheck` - Ensures the service is up and running and connected to Redis
+
+## About the data
+
+TODO

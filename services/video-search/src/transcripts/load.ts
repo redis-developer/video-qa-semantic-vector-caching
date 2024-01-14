@@ -28,7 +28,10 @@ export interface VideoInfo {
 const cache = cacheAside(config.youtube.TRANSCRIPT_PREFIX);
 const videoCache = jsonCacheAside<VideoInfo>(config.youtube.VIDEO_INFO_PREFIX);
 
-async function getTranscript(video: string, info: VideoInfo) {
+async function getTranscript(
+    video: string,
+    info: VideoInfo,
+): Promise<VideoDocument | undefined> {
     log.debug(
         `Getting transcript for https://www.youtube.com/watch?v=${video}`,
         {
@@ -39,16 +42,14 @@ async function getTranscript(video: string, info: VideoInfo) {
     const existingTranscript = await cache.get(video);
 
     if (typeof existingTranscript === 'string') {
-        return [
-            new Document({
-                metadata: {
-                    id: video,
-                    link: `https://www.youtube.com/watch?v=${video}`,
-                    ...info,
-                },
-                pageContent: existingTranscript,
-            }),
-        ];
+        return new Document({
+            metadata: {
+                id: video,
+                link: `https://www.youtube.com/watch?v=${video}`,
+                ...info,
+            },
+            pageContent: existingTranscript,
+        });
     }
 
     const loader = new SearchApiLoader({
@@ -58,26 +59,22 @@ async function getTranscript(video: string, info: VideoInfo) {
     });
 
     try {
-        const docs: VideoDocument[] = (await loader.load()).map((doc) => {
-            doc.metadata = {
-                id: video,
-                link: `https://www.youtube.com/watch?v=${video}`,
-                ...info,
-            };
+        const [doc] = await loader.load();
 
-            return doc as VideoDocument;
-        });
+        doc.metadata = {
+            id: video,
+            link: `https://www.youtube.com/watch?v=${video}`,
+            ...info,
+        };
 
-        await cache.set(video, docs[0].pageContent);
+        await cache.set(video, doc.pageContent);
 
-        return docs;
+        return doc as VideoDocument;
     } catch (e) {
         log.error(`Error loading transcript for ${video}`, {
             location: 'transcripts.load.getTranscript',
             error: e,
         });
-
-        return [];
     }
 }
 
@@ -162,5 +159,7 @@ export async function load(videos: string[] = config.youtube.VIDEOS) {
         return await getTranscript(video, videoInfo[video]);
     });
 
-    return transcripts.filter((transcript) => transcript.length > 0);
+    return transcripts.filter(
+        (transcript) => typeof transcript !== 'undefined',
+    ) as VideoDocument[];
 }
