@@ -60,19 +60,24 @@ export default function initialize({
                 1,
             );
 
-            log.debug(`Found closest answer with score: ${String(result[1])}`, {
-                location: `${prefix}.search.getAnswer`,
-                answer: result[0],
-                score: result[1],
-            });
-
             if (Array.isArray(result) && result.length > 0) {
-                log.debug(`Found answer: ${result[0].metadata.answer}`, {
-                    location: `${prefix}.search.getAnswer`,
-                    result: result[0].metadata,
-                });
+                log.debug(
+                    `Found closest answer with score: ${String(result[1])}`,
+                    {
+                        location: `${prefix}.search.getAnswer`,
+                        answer: result[0],
+                        score: result[1],
+                    },
+                );
 
-                return result[0].metadata;
+                if (Array.isArray(result) && result.length > 0) {
+                    log.debug(`Found answer: ${result[0].metadata.answer}`, {
+                        location: `${prefix}.search.getAnswer`,
+                        result: result[0].metadata,
+                    });
+
+                    return result[0].metadata;
+                }
             }
         }
 
