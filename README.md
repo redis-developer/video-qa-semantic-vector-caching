@@ -43,7 +43,7 @@ The process for how this app functions is as follows:
 
 ```json
 {
-    "videos": ["youtube-video-ids-or-urls"]
+    "videos": ["youTube-video-ids-or-urls"]
 }
 ```
 
@@ -78,4 +78,16 @@ Almost all of the remaining important logic is found in `src/router.ts` where yo
 
 ## About the data
 
-TODO
+The `video-service` is setup to log to the console as well as a `LOGS` stream in Redis. So if you don't want to worry about looking at the Docker console you can use [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) and look at the `LOGS` stream to see what's going on in the service.
+
+### How the data is stored
+
+The `video-service` uses a number of different data types to store data in Redis. In general, caching is applied where applicable to avoid making unneccesary calls to get YouTube transcripts/video info as well as calls to the LLMs. Not only does this save on potentially costly API calls, but it also speeds up the application drastically.
+
+Below you will find a description of each of the data types the `video-service` uses and what it uses it for:
+
+1. `Strings` - strings are used to cache video transcripts as well as summaries
+1. `Hashes` - hashes are used to store the vector embeddings for questions and YouTube video summaries
+1. `JSON` - Extra YouTube video information (title, description, and thumbnail) are stored in JSON documents since the app uses separate APIs for getting transcripts and getting addition video info
+1. `Sets` - A set is used to keep track of videos where the app has already made a call to summarize the transcript.
+1. `Streams` - A `LOGS` stream keeps a record of any log statement made in the `video-service`. Very useful for debugging.
