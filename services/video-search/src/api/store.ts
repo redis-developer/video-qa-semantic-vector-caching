@@ -33,8 +33,8 @@ export default function initialize({
         indexName: `${prefix}-${config.redis.ANSWER_INDEX_NAME}`,
         keyPrefix: `${prefix}-${config.redis.ANSWER_PREFIX}`,
         indexOptions: {
-            ALGORITHM: VectorAlgorithms.FLAT,
-            DISTANCE_METRIC: 'L2',
+            ALGORITHM: VectorAlgorithms.HNSW,
+            DISTANCE_METRIC: 'COSINE',
         },
     });
 
