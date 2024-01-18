@@ -52,7 +52,7 @@ export default {
     },
     searches: {
         KNN: 3,
-        answerCache: false,
+        answerCache: true,
     },
     log: {
         LEVEL: LOG_LEVEL ?? 'info',

@@ -18,23 +18,31 @@ export default function initialize({
     prefix,
     embeddings,
 }: Pick<ApiConfig, 'prefix' | 'embeddings'>): Store {
+    /**
+     * This vector store will match a short question (e.g. "Tell me about streams") with
+     * a bank of longer transcript summaries + questions.
+     */
     const vectorStore = new RedisVectorStore(embeddings, {
         redisClient: client,
         indexName: `${prefix}-${config.redis.VIDEO_INDEX_NAME}`,
         keyPrefix: `${prefix}-${config.redis.VIDEO_PREFIX}`,
         indexOptions: {
             ALGORITHM: VectorAlgorithms.HNSW,
-            DISTANCE_METRIC: 'COSINE',
+            DISTANCE_METRIC: 'IP',
         },
     });
 
+    /**
+     * This vector store will match a short question (e.g. "Tell me about streams") with previously
+     * answered questions (e.g. "What is a stream?")
+     */
     const answerVectorStore = new RedisVectorStore(embeddings, {
         redisClient: client,
         indexName: `${prefix}-${config.redis.ANSWER_INDEX_NAME}`,
         keyPrefix: `${prefix}-${config.redis.ANSWER_PREFIX}`,
         indexOptions: {
-            ALGORITHM: VectorAlgorithms.HNSW,
-            DISTANCE_METRIC: 'COSINE',
+            ALGORITHM: VectorAlgorithms.FLAT,
+            DISTANCE_METRIC: 'L2',
         },
     });
 

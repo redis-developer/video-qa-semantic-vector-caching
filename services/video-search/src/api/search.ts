@@ -41,46 +41,56 @@ export default function initialize({
         >);
     }
 
+    async function checkAnswerCache(question: string) {
+        const haveAnswers = await answerVectorStore.checkIndexExists();
+
+        if (!(haveAnswers && config.searches.answerCache)) {
+            return;
+        }
+
+        log.debug(`Searching for closest answer to question: ${question}`, {
+            location: `${prefix}.search.getAnswer`,
+            question,
+        });
+
+        const [result] = await answerVectorStore.similaritySearchWithScore(
+            question,
+            1,
+        );
+
+        if (Array.isArray(result) && result.length > 0) {
+            log.debug(`Found closest answer with score: ${String(result[1])}`, {
+                location: `${prefix}.search.getAnswer`,
+                score: result[1],
+            });
+
+            if (result[1] < 0.2) {
+                log.debug(`Found answer to question ${question}`, {
+                    location: `${prefix}.search.getAnswer`,
+                });
+
+                return result[0].metadata;
+            }
+
+            log.debug(`Score too low for question ${question}`, {
+                location: `${prefix}.search.getAnswer`,
+                score: result[1],
+            });
+        }
+    }
+
     async function searchVideos(question: string) {
         log.debug(`Original question: ${question}`, {
             location: `${prefix}.search.search`,
         });
-        const semanticQuestion = await prompt.getSemanticQuestion(question);
 
-        const haveAnswers = await answerVectorStore.checkIndexExists();
+        const existingAnswer = await checkAnswerCache(question);
 
-        if (haveAnswers && config.searches.answerCache) {
-            log.debug(
-                `Searching for closest answer to question: ${semanticQuestion}`,
-                {
-                    location: `${prefix}.search.getAnswer`,
-                    question,
-                },
-            );
-
-            const [result] = await answerVectorStore.similaritySearchWithScore(
-                semanticQuestion,
-                1,
-            );
-
-            if (Array.isArray(result) && result.length > 0) {
-                log.debug(
-                    `Found closest answer with score: ${String(result[1])}`,
-                    {
-                        location: `${prefix}.search.getAnswer`,
-                        score: result[1],
-                    },
-                );
-
-                if (Array.isArray(result) && result.length > 0) {
-                    log.debug(`Found answer to question ${semanticQuestion}`, {
-                        location: `${prefix}.search.getAnswer`,
-                    });
-
-                    return result[0].metadata;
-                }
-            }
+        if (typeof existingAnswer !== 'undefined') {
+            return existingAnswer;
         }
+
+        const semanticQuestion = await prompt.getSemanticQuestion(question);
 
         log.debug(`Semantic question: ${semanticQuestion}`, {
             location: `${prefix}.search.search`,
@@ -102,11 +112,12 @@ export default function initialize({
             location: `${prefix}.search.search`,
         });
 
-        const answerDocument = await prompt.answerQuestion(
-            semanticQuestion,
-            videos,
-        );
-        await answerVectorStore.addDocuments([answerDocument]);
+        // TODO: modify the prompt to ask both questions
+        const answerDocument = await prompt.answerQuestion(question, videos);
+
+        if (config.searches.answerCache) {
+            await answerVectorStore.addDocuments([answerDocument]);
+        }
 
         return answerDocument.metadata;
     }
