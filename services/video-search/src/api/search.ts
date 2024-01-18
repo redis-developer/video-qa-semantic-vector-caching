@@ -53,6 +53,9 @@ export default function initialize({
             question,
         });
 
+        /**
+         * Scores will be between 0 and 1, where 0 is most accurate and 1 is least accurate
+         */
         const [result] = await answerVectorStore.similaritySearchWithScore(
             question,
             1,
@@ -64,7 +67,7 @@ export default function initialize({
                 score: result[1],
             });
 
-            if (result[1] < 0.2) {
+            if (result[1] < config.searches.maxSimilarityScore) {
                 log.debug(`Found answer to question ${question}`, {
                     location: `${prefix}.search.getAnswer`,
                 });

@@ -52,6 +52,7 @@ export default {
     },
     searches: {
         KNN: 3,
+        maxSimilarityScore: 0.2,
         answerCache: true,
     },
     log: {
