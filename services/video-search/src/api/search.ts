@@ -49,14 +49,17 @@ export default function initialize({
 
         const haveAnswers = await answerVectorStore.checkIndexExists();
 
-        if (haveAnswers) {
-            log.debug(`Searching for closest answer to question: ${question}`, {
-                location: `${prefix}.search.getAnswer`,
-                question,
-            });
+        if (haveAnswers && config.searches.answerCache) {
+            log.debug(
+                `Searching for closest answer to question: ${semanticQuestion}`,
+                {
+                    location: `${prefix}.search.getAnswer`,
+                    question,
+                },
+            );
 
             const [result] = await answerVectorStore.similaritySearchWithScore(
-                question,
+                semanticQuestion,
                 1,
             );
 
@@ -65,15 +68,13 @@ export default function initialize({
                     `Found closest answer with score: ${String(result[1])}`,
                     {
                         location: `${prefix}.search.getAnswer`,
-                        answer: result[0],
                         score: result[1],
                     },
                 );
 
                 if (Array.isArray(result) && result.length > 0) {
-                    log.debug(`Found answer: ${result[0].metadata.answer}`, {
+                    log.debug(`Found answer to question ${semanticQuestion}`, {
                         location: `${prefix}.search.getAnswer`,
-                        result: result[0].metadata,
                     });
 
                     return result[0].metadata;

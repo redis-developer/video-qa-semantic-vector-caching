@@ -42,16 +42,23 @@ router.post('/videos', async (req, res) => {
 });
 
 router.get('/videos/search', async (req, res) => {
-    const { question } = req.query as { question: string };
-    const useApi = req.headers['x-use-api'] as 'google' | 'openai' | undefined;
+    const { question, api: useApi } = req.query as {
+        question: string;
+        api: 'google' | 'openai';
+    };
+
+    console.log(req.url);
 
     try {
+        log.debug(`Searching videos using ${useApi}`, {
+            question,
+            location: 'router.videos.search',
+        });
         const api = getApi(useApi);
         const results = await api.search.searchVideos(question);
 
-        log.info('Results for question', {
+        log.info('Results found for question', {
             question,
-            results,
             location: 'router.videos.search',
         });
 

@@ -7,6 +7,8 @@ import Modal from '@/components/Modal';
 import UploadButton from '@/components/UploadButton';
 import VideoForm from '@/components/VideoForm';
 import Markdown from '@/components/Markdown';
+import SettingsIcon from '@/components/SettingsIcon';
+import SettingsMenu from '@/components/SettingsMenu';
 
 interface VideoSearchResult {
   videos: VideoDocument[];
@@ -16,6 +18,8 @@ interface VideoSearchResult {
 export default function Home() {
   const [results, setResults] = useState<VideoSearchResult>();
   const [showModal, setShowModal] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('OpenAI');
 
   const handleSubmit = async (videos: string[]) => {
     // API call with the videos URLs
@@ -31,9 +35,21 @@ export default function Home() {
   const handleSearch = async (question: string) => {
     // Replace with your API call
     setResults(undefined);
-    const response = await fetch(`/api/search?question=${question}`);
+    const response = await fetch(
+      `/api/search?api=${selectedOption.toLowerCase()}&question=${question}`,
+    );
     const data: VideoSearchResult = await response.json();
     setResults(data);
+  };
+
+  const handleToggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
+
+  const handleSelectionChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSelectedOption(event.target.value);
   };
 
   return (
@@ -53,7 +69,11 @@ export default function Home() {
           )}
         </div>
       </main>
-
+      <SettingsMenu
+        isOpen={isSettingsOpen}
+        onSelectionChange={handleSelectionChange}
+        selectedOption={selectedOption}
+      />
       <Modal
         show={showModal}
         onClose={() => {
@@ -61,6 +81,8 @@ export default function Home() {
         }}>
         <VideoForm onSubmit={handleSubmit} />
       </Modal>
+
+      <SettingsIcon onToggle={handleToggleSettings} />
       <UploadButton
         onClick={() => {
           setShowModal(true);

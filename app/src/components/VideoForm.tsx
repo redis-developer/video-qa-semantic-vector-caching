@@ -1,56 +1,86 @@
-import { Formik, Form, Field, FieldArray } from 'formik';
+import { Formik, Form, Field } from 'formik';
+import CircularProgress from './CircularProgress';
 
 export interface VideoFormProps {
   onSubmit: (videos: string[]) => Promise<void> | void;
 }
 
 function VideoForm({ onSubmit }: VideoFormProps) {
+  const isValidYouTubeUrlOrId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (
+      Array.isArray(match) && (match[2].length === 11 || url.length === 11)
+    );
+  };
+
+  const validateYouTubeLinks = ({ videos }: { videos: string }) => {
+    const errors: { videos?: string } = {};
+    if (typeof videos !== 'string') {
+      errors.videos = 'Please enter YouTube links.';
+
+      return errors;
+    }
+
+    const urls = videos.split(',');
+    const invalidUrls = urls.filter(
+      (url) => !isValidYouTubeUrlOrId(url.trim()),
+    );
+
+    if (invalidUrls.length > 0) {
+      errors.videos = [
+        'The following values are not valid YouTube IDs or links.',
+        ...invalidUrls,
+      ].join(',');
+
+      return errors;
+    }
+  };
+
   return (
     <Formik
-      initialValues={{ videos: [''] }}
-      onSubmit={(values) => {
-        void onSubmit(values.videos);
-      }}>
-      {({ values }) => (
-        <Form className="space-y-4">
-          <FieldArray name="videos">
-            {({ insert, remove }) => (
-              <div>
-                {values.videos.map((video, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-wrap items-center gap-2">
-                    <Field
-                      name={`videos.${index}`}
-                      placeholder="Enter YouTube URL"
-                      className="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => remove(index)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none">
-                      Remove
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        insert(index, '');
-                      }}
-                      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none">
-                      Add
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </FieldArray>
-          <div className="flex justify-center">
+      initialValues={{ videos: '' }}
+      onSubmit={async ({ videos }, { setSubmitting }) => {
+        const videoIds = videos.split(',').map((url) => url.trim());
+        setSubmitting(true);
+        try {
+          await onSubmit(videoIds);
+        } catch (e) {}
+        setSubmitting(false);
+      }}
+      validate={validateYouTubeLinks}>
+      {({ errors, touched, isSubmitting }) => (
+        <Form>
+          <Field
+            name="videos"
+            as="textarea"
+            placeholder="Enter comma-separated YouTube links or IDs, e.g., https://youtu.be/dQw4w9WgXcQ, 3fumBcKC6RE"
+            className="w-full p-2 border rounded shadow-sm"
+          />
+          {typeof errors.videos === 'string' && touched.videos === true && (
+            <ul>
+              {errors.videos.split(',').map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          )}
+          {isSubmitting
+? (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              className="mt-2 bg-blue-500 text-white p-2 rounded">
+              <CircularProgress />
+            </button>
+          )
+: (
             <button
               type="submit"
-              className="py-2 px-4 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none">
+              className="mt-2 bg-blue-500 text-white p-2 rounded">
               Submit
             </button>
-          </div>
+          )}
         </Form>
       )}
     </Formik>

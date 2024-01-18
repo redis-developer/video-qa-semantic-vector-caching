@@ -51,7 +51,8 @@ export default {
         PORT: PORT ?? 8000,
     },
     searches: {
-        KNN: 10,
+        KNN: 3,
+        answerCache: false,
     },
     log: {
         LEVEL: LOG_LEVEL ?? 'info',
