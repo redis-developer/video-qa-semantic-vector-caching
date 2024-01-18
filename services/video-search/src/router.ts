@@ -3,6 +3,7 @@ import getApi from './api/index.js';
 import * as transcripts from './transcripts/index.js';
 import log from './log.js';
 import { client } from './db.js';
+import { type VideoSearchOptions } from './api/search.js';
 
 const router = express.Router();
 
@@ -42,12 +43,15 @@ router.post('/videos', async (req, res) => {
 });
 
 router.get('/videos/search', async (req, res) => {
-    const { question, api: useApi } = req.query as {
+    const {
+        question,
+        api: useApi,
+        useCache,
+    } = req.query as {
         question: string;
         api: 'google' | 'openai';
+        useCache?: 'true' | 'false';
     };
-
-    console.log(req.url);
 
     try {
         log.debug(`Searching videos using ${useApi}`, {
@@ -55,14 +59,24 @@ router.get('/videos/search', async (req, res) => {
             location: 'router.videos.search',
         });
         const api = getApi(useApi);
-        const results = await api.search.searchVideos(question);
+        const searchOptions: VideoSearchOptions = {};
+
+        if (typeof useCache === 'string') {
+            if (useCache.toLowerCase() === 'true') {
+                searchOptions.useCache = true;
+            } else if (useCache.toLowerCase() === 'false') {
+                searchOptions.useCache = false;
+            }
+        }
+
+        const results = await api.search.searchVideos(question, searchOptions);
 
         log.info('Results found for question', {
             question,
             location: 'router.videos.search',
         });
 
-        res.status(200).json({ ...results });
+        res.status(200).json(results);
     } catch (e) {
         log.error('Unexpected error in /videos/search', {
             error: {

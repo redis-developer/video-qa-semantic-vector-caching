@@ -7,5 +7,5 @@ export async function GET(request: NextRequest) {
     const response = await fetch(`${SEARCH_API}${request.nextUrl.search}`);
     const data = await response.json();
 
-    return Response.json({ ...data });
+    return Response.json(data);
 }

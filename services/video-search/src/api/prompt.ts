@@ -18,6 +18,8 @@ import { type ApiConfig } from './index.js';
 export type AnswerDocument = Document<{
     videos: VideoDocument[];
     answer: string;
+    question?: string;
+    isOriginal?: boolean;
 }>;
 
 export interface Prompt {
