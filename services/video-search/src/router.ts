@@ -17,15 +17,10 @@ router.post('/videos', async (req, res) => {
         });
 
         const google = getApi('google');
-        const openai = getApi('openai');
         const documents = await transcripts.load(videos);
 
         await google.store.storeVideoVectors(
             await google.prompt.summarizeVideos(documents),
-        );
-
-        await openai.store.storeVideoVectors(
-            await openai.prompt.summarizeVideos(documents),
         );
 
         res.status(200).json({ message: 'Videos loaded' });
@@ -43,17 +38,14 @@ router.post('/videos', async (req, res) => {
 });
 
 router.get('/videos/search', async (req, res) => {
-    const {
-        question,
-        api: useApi,
-        useCache,
-    } = req.query as {
+    const { question, useCache } = req.query as {
         question: string;
         api: 'google' | 'openai';
         useCache?: 'true' | 'false';
     };
 
     try {
+        const useApi = 'google';
         log.debug(`Searching videos using ${useApi}`, {
             question,
             location: 'router.videos.search',

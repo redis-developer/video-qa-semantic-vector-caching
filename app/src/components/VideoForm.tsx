@@ -64,8 +64,7 @@ function VideoForm({ onSubmit }: VideoFormProps) {
               ))}
             </ul>
           )}
-          {isSubmitting
-? (
+          {isSubmitting ? (
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -73,8 +72,7 @@ function VideoForm({ onSubmit }: VideoFormProps) {
               className="mt-2 bg-blue-500 text-white p-2 rounded">
               <CircularProgress />
             </button>
-          )
-: (
+          ) : (
             <button
               type="submit"
               className="mt-2 bg-blue-500 text-white p-2 rounded">

@@ -25,7 +25,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('OpenAI');
+  const [selectedOption, setSelectedOption] = useState('Google');
 
   const handleSubmit = async (videos: string[]) => {
     // API call with the videos URLs
@@ -77,13 +77,13 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <div className="container mx-auto p-4">
           <h1 className="text-3xl md:text-4xl font-bold text-center text-indigo-600 my-8">
-            Ask me about Redis
+            Video Q&A with Redis: Ask anything about Redis
           </h1>
           <QuestionForm onSubmit={handleSearch} />
           {Array.isArray(results) && !haveResults && !isSearching && (
             <p className="mt-4">No results found. Try another question.</p>
           )}
-          {!haveOriginal && (
+          {!haveOriginal && haveResults && (
             <>
               <h2 className="text-xl font-bold mb-2 mt-4">
                 Your question has already been asked in a different way, here
@@ -102,11 +102,9 @@ export default function Home() {
 
                   void handleSearch(currentQuestion, false);
                 }}>
-                {isSearching
-? (
+                {isSearching ? (
                   <CircularProgress />
-                )
-: (
+                ) : (
                   <span>Generate unique response</span>
                 )}
               </button>
@@ -141,7 +139,7 @@ export default function Home() {
         <VideoForm onSubmit={handleSubmit} />
       </Modal>
 
-      <SettingsIcon onToggle={handleToggleSettings} />
+      {/* <SettingsIcon onToggle={handleToggleSettings} /> */}
       <UploadButton
         onClick={() => {
           setShowModal(true);
