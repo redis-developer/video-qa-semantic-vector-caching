@@ -5,6 +5,8 @@ services:
         image: 'redis/redis-stack:latest'
         ports:
             - 6379:6379
+        volumes:
+            - ${PWD}/db/:/data
         deploy:
             replicas: 1
             restart_policy:
